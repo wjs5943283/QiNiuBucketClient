@@ -51,6 +51,7 @@
             <TextBox x:Name="txtDelAfDays" HorizontalAlignment="Left" Height="23" Margin="88,10,0,0" TextWrapping="Wrap" Text="365" VerticalAlignment="Top" Width="37"/>
         </GroupBox>
         <Label Content="天后删除" HorizontalAlignment="Left" Margin="139,154,0,0" VerticalAlignment="Top" Height="24" Width="60" Grid.Column="1" RenderTransformOrigin="1.368,4.625"/>
+        <ProgressBar Name="pb1"  Grid.Column="1" HorizontalAlignment="Left" Height="10" Margin="340,159,0,0" VerticalAlignment="Top" Width="100"/>
 
     </Grid>
 </Window>

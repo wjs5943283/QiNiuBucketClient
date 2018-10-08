@@ -37,9 +37,24 @@ namespace QiNiuClient
         private QiNiuClientCfg qiNiuClientCfg;
         private string[] fileUploadFiles;
         private PutPolicy putPolicy;
-       
         private StringBuilder uploadResult;
         private List<QiNiuFileInfo> qiNiuFileInfoList;
+
+        private delegate void SetProgressBarHandle(int value);
+
+        private void SetProgressBar(int val)
+        {
+            if (this.Dispatcher.Thread != System.Threading.Thread.CurrentThread)
+            {
+                this.Dispatcher.Invoke(new SetProgressBarHandle(this.SetProgressBar), val);
+            }
+            else
+            {
+                pb1.Value = val;
+            }
+        }
+
+
 
         // private OpenDialogView openDialog ;
         /// <summary>
@@ -49,9 +64,10 @@ namespace QiNiuClient
         /// <param name="e"></param>
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-           
 
-
+            pb1.Visibility = Visibility.Hidden;
+            pb1.Maximum = 100;
+            pb1.Value = 1;
 
             //加载区域列表
             AreaComboBox.ItemsSource = QiniuArea.GetList();
@@ -137,13 +153,31 @@ namespace QiNiuClient
             
             this.SyncTargetBucketsComboBox.ItemsSource = null;
             BtnConnet.IsEnabled = false;
+            pb1.Visibility = Visibility.Visible;
             // new Thread(this.reloadBuckets).Start();
             //使用线程池
             System.Threading.ThreadPool.QueueUserWorkItem((state) =>
             {
+               
                 reloadBuckets();
             });
 
+            System.Threading.ThreadPool.QueueUserWorkItem((state) =>
+            {
+                int i = 1;
+                while (true)
+                {
+                    
+                    i++;
+                    if (i == 100)
+                    {
+                        i = 1;
+                    }
+                    SetProgressBar(i);
+                    Thread.Sleep(100);
+                }
+
+            });
 
             Thread.Sleep(10);
         }
@@ -181,7 +215,7 @@ namespace QiNiuClient
                 {
                     this.SyncTargetBucketsComboBox.ItemsSource = buckets;
                     BtnConnet.IsEnabled = true;
-
+                    pb1.Visibility = Visibility.Hidden;
                     MessageBox.Show("连接成功！");
                 }));
             }
@@ -194,14 +228,17 @@ namespace QiNiuClient
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void btnSearch_Click(object sender, RoutedEventArgs e)
+        private  void btnSearch_Click(object sender, RoutedEventArgs e)
         {
             //根据空间名查询空间内容
-
+         
             Search();
+           
 
         }
-
+        /// <summary>
+        /// 查询
+        /// </summary>
         private void Search()
         {
             if (string.IsNullOrWhiteSpace(marker))
@@ -280,6 +317,7 @@ namespace QiNiuClient
             btnUpload.IsEnabled = true;
             btnBatchDel.IsEnabled = true;
             btnBatchDownload.IsEnabled = true;
+            if(SyncTargetBucketsComboBox.SelectedValue!=null)
             bucket = SyncTargetBucketsComboBox.SelectedValue.ToString();
             qiNiuFileInfoList = new List<QiNiuFileInfo>();
 
@@ -299,13 +337,6 @@ namespace QiNiuClient
 
             }
             //2.选择下载保存的路径
-
-            //var sfd = new Microsoft.Win32.SaveFileDialog {RestoreDirectory = true};
-            //if (sfd.ShowDialog() == true)
-            //{
-            //    fileSaveDir = Path.GetDirectoryName(sfd.FileName);
-            //}
-
 
             var sfd = new System.Windows.Forms.FolderBrowserDialog
             {
@@ -332,6 +363,7 @@ namespace QiNiuClient
                     list.Add(info);
                 }
             }
+            pb1.Visibility = Visibility.Visible;
             if (list.Count > 0)
             {
                 //执行批量下载方法
@@ -340,16 +372,34 @@ namespace QiNiuClient
                 {
                     batchDownLoad(list);
                 });
+                System.Threading.ThreadPool.QueueUserWorkItem((state) =>
+                {
+                    int i = 1;
+                    while (true)
+                    {
 
+                        i++;
+                        if (i == 100)
+                        {
+                            i = 1;
+                        }
+                        SetProgressBar(i);
+                        Thread.Sleep(100);
+                    }
+
+                });
 
                 Thread.Sleep(10);
             }
-
+            pb1.Visibility = Visibility.Hidden;
 
 
         }
 
-
+        /// <summary>
+        /// 批量下载
+        /// </summary>
+        /// <param name="list"></param>
         private void batchDownLoad(List<QiNiuFileInfo> list)
         {
 
@@ -399,7 +449,6 @@ namespace QiNiuClient
 
             }
 
-
             List<QiNiuFileInfo> list = new List<QiNiuFileInfo>();
             foreach (var item in dgResult.SelectedItems)
             {
@@ -430,16 +479,19 @@ namespace QiNiuClient
                 }
                 MessageBox.Show("批量删除成功！");
                 
-             
                 Search();
                 Thread.Sleep(10);
             }
 
-
-
         }
 
-        private void btnUpload_Click(object sender, RoutedEventArgs e)
+
+        /// <summary>
+        /// 上传
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private  void btnUpload_Click(object sender, RoutedEventArgs e)
         {
             var ofd = new System.Windows.Forms.OpenFileDialog
             {
@@ -546,7 +598,7 @@ namespace QiNiuClient
 
         }
 
-        private void UploadFileOverlay(string file,bool overLay=false)
+        private  void UploadFileOverlay(string file,bool overLay=false)
         {
             //  string filePath = LocalFile;
             if (uploadResult == null)
@@ -574,9 +626,10 @@ namespace QiNiuClient
                 //设置断点续传进度记录文件
                
                 uploadResult.AppendLine("record file:" + extra.ResumeRecordFile);
-               // extra.ResumeRecordFile = "test.progress";
-               //todo:未实现上传进度
-                HttpResult result = target.UploadStream(fs, key, token, extra);
+                // extra.ResumeRecordFile = "test.progress";
+                //todo:未实现上传进度
+               HttpResult result = target.UploadStream(fs, key, token, extra);
+              
                 if (result.Code == 200)
                 {
                     uploadResult.AppendLine("上传成功！ " );
