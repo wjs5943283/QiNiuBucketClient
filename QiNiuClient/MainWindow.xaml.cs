@@ -153,7 +153,7 @@ namespace QiNiuClient
             
             this.SyncTargetBucketsComboBox.ItemsSource = null;
             BtnConnet.IsEnabled = false;
-            pb1.Visibility = Visibility.Visible;
+          
             // new Thread(this.reloadBuckets).Start();
             //使用线程池
             System.Threading.ThreadPool.QueueUserWorkItem((state) =>
@@ -161,6 +161,18 @@ namespace QiNiuClient
                
                 reloadBuckets();
             });
+
+            LoadProgressBar();
+
+            Thread.Sleep(10);
+        }
+        
+        /// <summary>
+        /// 加载进度条
+        /// </summary>
+        private void LoadProgressBar()
+        {
+            pb1.Visibility = Visibility.Visible;
 
             System.Threading.ThreadPool.QueueUserWorkItem((state) =>
             {
@@ -179,8 +191,8 @@ namespace QiNiuClient
 
             });
 
-            Thread.Sleep(10);
         }
+
 
         private void reloadBuckets()
         {
@@ -363,7 +375,7 @@ namespace QiNiuClient
                     list.Add(info);
                 }
             }
-            pb1.Visibility = Visibility.Visible;
+          
             if (list.Count > 0)
             {
                 //执行批量下载方法
@@ -372,23 +384,7 @@ namespace QiNiuClient
                 {
                     batchDownLoad(list);
                 });
-                System.Threading.ThreadPool.QueueUserWorkItem((state) =>
-                {
-                    int i = 1;
-                    while (true)
-                    {
-
-                        i++;
-                        if (i == 100)
-                        {
-                            i = 1;
-                        }
-                        SetProgressBar(i);
-                        Thread.Sleep(100);
-                    }
-
-                });
-
+                LoadProgressBar();
                 Thread.Sleep(10);
             }
             pb1.Visibility = Visibility.Hidden;
@@ -399,8 +395,8 @@ namespace QiNiuClient
         /// <summary>
         /// 批量下载
         /// </summary>
-        /// <param name="list"></param>
-        private void batchDownLoad(List<QiNiuFileInfo> list)
+        /// <param name="qiNiuFileInfolist"></param>
+        private void batchDownLoad(IEnumerable<QiNiuFileInfo> qiNiuFileInfolist)
         {
 
 
@@ -413,7 +409,7 @@ namespace QiNiuClient
                 domain = config.UseHttps ? "https://" + domain : "http://" + domain;
 
 
-                foreach (QiNiuFileInfo info in list)
+                foreach (QiNiuFileInfo info in qiNiuFileInfolist)
                 {
                     string pubfile = DownloadManager.CreatePublishUrl(domain, info.FileName);
                     string saveFile = Path.Combine(fileSaveDir, info.FileName.Replace('/', '-'));
