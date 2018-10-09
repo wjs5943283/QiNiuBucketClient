@@ -46,12 +46,12 @@
         <Button Name="btnBatchDel" Content="删除"  IsEnabled="False" HorizontalAlignment="Left" Margin="601,104,0,0" VerticalAlignment="Top" Width="75" Height="21" Click="btnBatchDel_Click" Grid.Column="1"/>
         <Button Name="btnBatchDownload" Content="下载"  IsEnabled="False" HorizontalAlignment="Left" Margin="502,104,0,0" VerticalAlignment="Top" Width="75" Height="21" RenderTransformOrigin="-0.813,0.619" Click="btnBatchDownload_Click" Grid.Column="1"/>
         <CheckBox Name="cbOverlay" Content="覆盖上传" HorizontalAlignment="Left" Margin="31,159,0,0" VerticalAlignment="Top" Grid.Column="1" RenderTransformOrigin="-14.718,5.143" Height="14" Width="71"/>
-        <CheckBox Name="cbResume" Content="续点上传" HorizontalAlignment="Left" Margin="204,159,0,0" VerticalAlignment="Top" Grid.Column="1" RenderTransformOrigin="-14.718,5.143" Height="14" Width="71"/>
+        <CheckBox Name="cbResume" Content="大文件上传" HorizontalAlignment="Left" Margin="204,159,0,0" VerticalAlignment="Top" Grid.Column="1" RenderTransformOrigin="-14.718,5.143" Height="14" Width="90"/>
         <GroupBox Grid.ColumnSpan="2" Header="上传设置 " HorizontalAlignment="Left" Height="58" Margin="11,131,0,0" VerticalAlignment="Top" Width="665">
             <TextBox x:Name="txtDelAfDays" HorizontalAlignment="Left" Height="23" Margin="88,10,0,0" TextWrapping="Wrap" Text="365" VerticalAlignment="Top" Width="37"/>
         </GroupBox>
         <Label Content="天后删除" HorizontalAlignment="Left" Margin="139,154,0,0" VerticalAlignment="Top" Height="24" Width="60" Grid.Column="1" RenderTransformOrigin="1.368,4.625"/>
-        <ProgressBar Name="pb1"  Grid.Column="1" HorizontalAlignment="Left" Height="10" Margin="340,159,0,0" VerticalAlignment="Top" Width="100"/>
+        <ProgressBar Name="pb1"  Grid.Column="1" HorizontalAlignment="Left" Height="19" Margin="340,154,0,0" VerticalAlignment="Top" Width="143"/>
 
     </Grid>
 </Window>

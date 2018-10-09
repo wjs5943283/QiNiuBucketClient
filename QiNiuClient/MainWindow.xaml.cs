@@ -156,7 +156,7 @@ namespace QiNiuClient
           
             // new Thread(this.reloadBuckets).Start();
             //使用线程池
-            System.Threading.ThreadPool.QueueUserWorkItem((state) =>
+            ThreadPool.QueueUserWorkItem((state) =>
             {
                
                 reloadBuckets();
@@ -174,7 +174,7 @@ namespace QiNiuClient
         {
             pb1.Visibility = Visibility.Visible;
 
-            System.Threading.ThreadPool.QueueUserWorkItem((state) =>
+            ThreadPool.QueueUserWorkItem((state) =>
             {
                 int i = 1;
                 while (true)
@@ -204,15 +204,7 @@ namespace QiNiuClient
                 if (File.Exists("QiNiuClientCfg.Json"))
                 {
                     File.Delete("QiNiuClientCfg.Json");
-                    //string json = File.ReadAllText("QiNiuClientCfg.Json");
-                    // qiNiuClientCfg = JsonConvert.DeserializeObject<QiNiuClientCfg>(json);
-                    //if (qiNiuClientCfg != null)
-                    //{
-                    //    if (TxtAK.Text != qiNiuClientCfg.Ak)
-                    //    qiNiuClientCfg.Ak = TxtAK.Text;
-                    //    if(TxtSk.Text != qiNiuClientCfg.Sk)
-                    //     qiNiuClientCfg.Sk = TxtSk.Text;
-                    //}
+                    
                 }
                 
                  
@@ -380,7 +372,9 @@ namespace QiNiuClient
             {
                 //执行批量下载方法
                 //使用线程池
-                System.Threading.ThreadPool.QueueUserWorkItem((state) =>
+                btnBatchDownload.IsEnabled = false;
+               
+                ThreadPool.QueueUserWorkItem(state =>
                 {
                     batchDownLoad(list);
                 });
@@ -389,7 +383,7 @@ namespace QiNiuClient
             }
             pb1.Visibility = Visibility.Hidden;
 
-
+            btnBatchDownload.IsEnabled = true;
         }
 
         /// <summary>
@@ -402,37 +396,48 @@ namespace QiNiuClient
 
             if (domainsResult.Result.Count > 0)
             {
+
                 string domain = domainsResult.Result[0];
                 //string key = "hello/world/七牛/test.png";
                 //string privateUrl = DownloadManager.CreatePrivateUrl(mac, domain, key, 3600);
 
                 domain = config.UseHttps ? "https://" + domain : "http://" + domain;
 
-
-                foreach (QiNiuFileInfo info in qiNiuFileInfolist)
-                {
-                    string pubfile = DownloadManager.CreatePublishUrl(domain, info.FileName);
-                    string saveFile = Path.Combine(fileSaveDir, info.FileName.Replace('/', '-'));
-                    if (File.Exists(saveFile))
+               var rresult = new StringBuilder();
+                
+                    foreach (QiNiuFileInfo info in qiNiuFileInfolist)
                     {
-                        saveFile = Path.Combine(fileSaveDir,
-                            Path.GetFileNameWithoutExtension(info.FileName.Replace('/', '-')) + Guid.NewGuid() +
-                            Path.GetExtension(info.FileName));
-                    }
-                    HttpResult result = DownloadManager.Download(pubfile, saveFile);
-                    if (result.Code != 200)
-                    {
-                        result = DownloadManager.Download(
-                            DownloadManager.CreatePrivateUrl(mac, domain, info.FileName, 3600), saveFile);
+                        string pubfile = DownloadManager.CreatePublishUrl(domain, info.FileName);
+                        string saveFile = Path.Combine(fileSaveDir, info.FileName.Replace('/', '-'));
+                        if (File.Exists(saveFile))
+                        {
+                            saveFile = Path.Combine(fileSaveDir,
+                                Path.GetFileNameWithoutExtension(info.FileName.Replace('/', '-')) + Guid.NewGuid() +
+                                Path.GetExtension(info.FileName));
+                        }
+                        HttpResult result = DownloadManager.Download(pubfile, saveFile);
                         if (result.Code != 200)
                         {
-                            MessageBox.Show(info.FileName + "下载失败！");
-                            return;
+                            result = DownloadManager.Download(
+                                DownloadManager.CreatePrivateUrl(mac, domain, info.FileName, 3600), saveFile);
+                            if (result.Code != 200)
+                            {
+                                rresult.AppendLine(info.FileName + ":下载失败！");
+                                return;
+                            }
                         }
-                    }
 
+                    }
+                if (string.IsNullOrWhiteSpace(rresult.ToString()))
+                {
+                    MessageBox.Show("下载结束！");
                 }
-                MessageBox.Show("下载完成！");
+                else
+                {
+                    MessageBox.Show(rresult.ToString());
+                }
+                   
+               
             }
         }
 
@@ -515,38 +520,69 @@ namespace QiNiuClient
              fileUploadFiles = ofd.FileNames;
              
             if(fileUploadFiles.Length<=0)return;
-            
-          
 
+
+            bool? result;
             if (cbResume.IsChecked == true)
             {
+                result = null;
                 //续点上传
                 btnUpload.Content = "正在上传......";
                 btnUpload.IsEnabled = false;
                 if (cbOverlay.IsChecked == true)
                 {
-                  
-                    UploadFileOverlay(fileUploadFiles[0],true);
+                    LoadProgressBar();
+
+                   
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+                        result = UploadFileOverlay(fileUploadFiles[0], true);
+                        pb1.Visibility = Visibility.Hidden;
+                       
+                      
+                    }));
+
 
                 }
                 else
                 {
-                    UploadFileOverlay(fileUploadFiles[0]);
+
+                    LoadProgressBar();
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+                        result = UploadFileOverlay(fileUploadFiles[0]);
+                        pb1.Visibility = Visibility.Hidden;
+
+                    }));
+
+
+
+
                 }
-                MessageBox.Show(uploadResult.ToString());
+                if (result == true)
+                {
+                    MessageBox.Show("上传成功！");
+                }
+                else if(result==false)
+                {
+                    MessageBox.Show(uploadResult.ToString());
+                } 
+            
                 btnUpload.Content = "上传";
                 btnUpload.IsEnabled = true;
+                uploadResult = new StringBuilder();
                 Search();
             }
             else
             {
+
                 foreach (string file in fileUploadFiles)
                 {
                     var fileInfo = new  System.IO.FileInfo(file);
 
-                    if (fileInfo.Length > 1024 * 1024 * 10)
+                    if (fileInfo.Length > 1024 * 1024 * 100)
                     {
-                        MessageBox.Show("单个文件大小不得小于10M");
+                        MessageBox.Show("单个文件大小不得大于100M");
                         return;
                     }
                 }
@@ -559,32 +595,49 @@ namespace QiNiuClient
 
                 btnUpload.Content = "正在上传......";
                 btnUpload.IsEnabled = false;
-                bool result = true;
+                result = true;
 
                 //普通上传
                 if (cbOverlay.IsChecked == true)
                 {
                     //覆盖上传
-            
+                    LoadProgressBar();
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+
                    
                     foreach (string file in fileUploadFiles)
-                    {
-                        result= result & UploadFile(file,true);
-                    }
-                  
+                        {
+                            result = result & UploadFile(file, true);
+                        }
+                        pb1.Visibility = Visibility.Hidden;
+                    }));
+
+                   
+
                 }
                 else
                 {
                     //不覆盖上传，文件若存在就跳过
-                 
-                    foreach (string file in fileUploadFiles)
+                    LoadProgressBar();
+                    Dispatcher.Invoke(new Action(() =>
                     {
-                        result = result & UploadFile(file);
-                    }
+
+                  
+                    foreach (string file in fileUploadFiles)
+                        {
+                            result = result & UploadFile(file);
+                        }
+                        pb1.Visibility = Visibility.Hidden;
+                    }));
+
+                  
+                  
                  
                 }
                
                 MessageBox.Show(result == false ? uploadResult.ToString() : "上传成功！");
+               
                 Search();
                 uploadResult = new StringBuilder();
                 btnUpload.Content = "上传";
@@ -594,7 +647,7 @@ namespace QiNiuClient
 
         }
 
-        private  void UploadFileOverlay(string file,bool overLay=false)
+        private  bool UploadFileOverlay(string file,bool overLay=false)
         {
             //  string filePath = LocalFile;
             if (uploadResult == null)
@@ -629,19 +682,20 @@ namespace QiNiuClient
                 if (result.Code == 200)
                 {
                     uploadResult.AppendLine("上传成功！ " );
+                    return true;
                 }
                 else
                 {
                     string s = $"Code={result.Code},Text={result.Text}";
                     uploadResult.AppendLine("uploadResult:" + s);
+                    return false;
                 }
                
                
             }
-            else
-            {
-                uploadResult.AppendLine("成员变量putPolicy为空！");
-            }
+               uploadResult.AppendLine("成员变量putPolicy为空！");
+                return false;
+            
 
            
 
