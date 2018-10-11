@@ -6,6 +6,17 @@
         xmlns:local="clr-namespace:QiNiuClient"
         mc:Ignorable="d"
         Title="七牛存储管理客户端" Height="601" Width="709" Loaded="Window_Loaded" Icon="1.ico">
+    <Window.Resources>
+        <ContextMenu x:Key="ContextMenu">
+            <MenuItem  Header="刷新" Click="MiRefresh_Click" />
+            <MenuItem  Header="下载" Click="MiDownload_Click" />
+            <MenuItem  Header="删除" Click="MiDelete_Click" />
+            <MenuItem  Header="全选" Click="MISelectAll_Click" />
+            <MenuItem  Header="复制文件名" Click="MICopyFileName_Click" />
+            <MenuItem  Header="复制下载地址" Click="MICopyNetAddress_Click" />
+            <MenuItem  Header="复制下载地址(Token)" Click="MICopyNetAddressWithToken_Click" />
+        </ContextMenu> 
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="97*"/>
@@ -29,8 +40,8 @@
         <Label Content="StartWith:" HorizontalAlignment="Left" Margin="11,102,0,0" VerticalAlignment="Top" Height="24" Width="76" RenderTransformOrigin="0.5,2.667" Grid.Column="1"/>
         <TextBox Name="txtEndWith" HorizontalAlignment="Left" Height="23" Margin="221,103,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="73" Grid.Column="1"/>
         <Label Content="EndWith:" HorizontalAlignment="Left" Margin="162,102,0,0" VerticalAlignment="Top" Height="24" Width="76" RenderTransformOrigin="0.5,2.667" Grid.Column="1"/>
-        <DataGrid Name="dgResult" Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False" Grid.ColumnSpan="2">
-
+        <DataGrid ContextMenu="{StaticResource ContextMenu}" Name="dgResult" Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False" Grid.ColumnSpan="2">
+                   
             <DataGrid.Columns>
                 <DataGridTextColumn Header="序号" Binding="{Binding Num}"></DataGridTextColumn>
                 <DataGridTextColumn  Header="文件名" Binding="{Binding FileName}" />
@@ -54,4 +65,5 @@
         <ProgressBar Name="pb1"  Grid.Column="1" HorizontalAlignment="Left" Height="19" Margin="340,154,0,0" VerticalAlignment="Top" Width="143"/>
 
     </Grid>
+   
 </Window>

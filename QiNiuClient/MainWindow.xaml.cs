@@ -334,6 +334,11 @@ namespace QiNiuClient
         /// <param name="e"></param> 
         private void btnBatchDownload_Click(object sender, RoutedEventArgs e)
         {
+           DownLoad();
+        }
+
+        private void DownLoad()
+        {
             //1.获得表中选中的数据
             if (dgResult.ItemsSource == null && dgResult.SelectedItems.Count <= 0)
             {
@@ -356,24 +361,24 @@ namespace QiNiuClient
 
 
             fileSaveDir = sfd.SelectedPath;
-            
 
-          List <QiNiuFileInfo> list = new List<QiNiuFileInfo>();
+
+            List<QiNiuFileInfo> list = new List<QiNiuFileInfo>();
             foreach (var item in dgResult.SelectedItems)
             {
-                QiNiuFileInfo info = (QiNiuFileInfo) item;
+                QiNiuFileInfo info = (QiNiuFileInfo)item;
                 if (info != null)
                 {
                     list.Add(info);
                 }
             }
-          
+
             if (list.Count > 0)
             {
                 //执行批量下载方法
                 //使用线程池
                 btnBatchDownload.IsEnabled = false;
-               
+
                 ThreadPool.QueueUserWorkItem(state =>
                 {
                     batchDownLoad(list);
@@ -392,8 +397,6 @@ namespace QiNiuClient
         /// <param name="qiNiuFileInfolist"></param>
         private void batchDownLoad(IEnumerable<QiNiuFileInfo> qiNiuFileInfolist)
         {
-
-
             if (domainsResult.Result.Count > 0)
             {
 
@@ -443,6 +446,12 @@ namespace QiNiuClient
 
         private void btnBatchDel_Click(object sender, RoutedEventArgs e)
         {
+            Delete();
+
+        }
+
+        private void Delete()
+        {
             //1.获得表中选中的数据
             if (dgResult.ItemsSource == null && dgResult.SelectedItems.Count <= 0)
             {
@@ -453,7 +462,7 @@ namespace QiNiuClient
             List<QiNiuFileInfo> list = new List<QiNiuFileInfo>();
             foreach (var item in dgResult.SelectedItems)
             {
-                QiNiuFileInfo info = (QiNiuFileInfo) item;
+                QiNiuFileInfo info = (QiNiuFileInfo)item;
                 if (info != null)
                 {
                     list.Add(info);
@@ -479,20 +488,177 @@ namespace QiNiuClient
                     return;
                 }
                 MessageBox.Show("批量删除成功！");
-                
+
                 Search();
                 Thread.Sleep(10);
+            }
+        }
+
+
+        private void MiDownload_Click(object sender, RoutedEventArgs e)
+        {
+            DownLoad();
+        }
+
+        //MiDelete_Click
+        private void MiDelete_Click(object sender, RoutedEventArgs e)
+        {
+            Delete();
+        }
+
+        private void MISelectAll_Click(object sender, RoutedEventArgs e)
+        {
+            if (dgResult.ItemsSource == null && dgResult.SelectedItems.Count <= 0)
+            {
+                return;
+
+            }
+            dgResult.SelectAll();
+          //  dgResult.Items.Refresh();
+
+        }
+
+        private void MICopyFileName_Click(object sender, RoutedEventArgs e)
+        {
+            if (dgResult.ItemsSource == null && dgResult.SelectedItems.Count <= 0)
+            {
+                return;
+
+            }
+         
+            List<QiNiuFileInfo> list = new List<QiNiuFileInfo>();
+            foreach (var item in dgResult.SelectedItems)
+            {
+                QiNiuFileInfo info = (QiNiuFileInfo) item;
+                if (info != null)
+                {
+                    list.Add(info);
+                }
+            }
+            if (list.Count > 0)
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (QiNiuFileInfo qiNiuFileInfo in list)
+                {
+                    sb.AppendLine(qiNiuFileInfo.FileName);
+                }
+                if (!string.IsNullOrWhiteSpace(sb.ToString()))
+                {
+                   Clipboard.SetText(sb.ToString()); 
+                }
             }
 
         }
 
+       /// <summary>
+       /// 复制下载地址 
+       /// </summary>
+       /// <param name="sender"></param>
+       /// <param name="e"></param>
+        private void MICopyNetAddress_Click(object sender, RoutedEventArgs e)
+       {
+           GetNetAddress();
 
+       }
+
+        private void MICopyNetAddressWithToken_Click(object sender, RoutedEventArgs e)
+        {
+            GetNetAddress(true);
+
+        }
+
+        private void GetNetAddress(bool isPrivate=false)
+        {
+            if (dgResult.ItemsSource == null && dgResult.SelectedItems.Count <= 0)
+            {
+                return;
+
+            }
+
+            List<QiNiuFileInfo> list = new List<QiNiuFileInfo>();
+            foreach (var item in dgResult.SelectedItems)
+            {
+                QiNiuFileInfo info = (QiNiuFileInfo)item;
+                if (info != null)
+                {
+                    list.Add(info);
+                }
+            }
+            if (list.Count > 0)
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (QiNiuFileInfo qiNiuFileInfo in list)
+                {
+                    //根据文件名获得下载地址
+                    sb.AppendLine(isPrivate
+                        ? GetPrivateUrl(qiNiuFileInfo.FileName)
+                        : GetPublishUrl(qiNiuFileInfo.FileName));
+                }
+
+                if (!string.IsNullOrWhiteSpace(sb.ToString()))
+                {
+                    Clipboard.SetText(sb.ToString());
+                }
+            }
+        }
+
+        /// <summary>
+        /// 根据文件名获得下载地址
+        /// </summary>
+        /// <param name="fileName">文件名</param>
+        /// <returns></returns>
+        private string GetPublishUrl(string fileName)
+        {
+            if (domainsResult.Result.Count > 0)
+            {
+
+                string domain = domainsResult.Result[0];
+                //string key = "hello/world/七牛/test.png";
+                //string privateUrl = DownloadManager.CreatePrivateUrl(mac, domain, key, 3600);
+
+                domain = config.UseHttps ? "https://" + domain : "http://" + domain;
+                return DownloadManager.CreatePublishUrl(domain, fileName);
+              // string prvfile= DownloadManager.CreatePrivateUrl(mac, domain, fileName, 3600);
+
+            }
+
+
+            return string.Empty;
+        }
+
+        private string GetPrivateUrl(string fileName)
+        {
+            if (domainsResult.Result.Count > 0)
+            {
+
+                string domain = domainsResult.Result[0];
+                //string key = "hello/world/七牛/test.png";
+                //string privateUrl = DownloadManager.CreatePrivateUrl(mac, domain, key, 3600);
+
+                domain = config.UseHttps ? "https://" + domain : "http://" + domain;
+              //  string pubfile = DownloadManager.CreatePublishUrl(domain, fileName);
+              return DownloadManager.CreatePrivateUrl(mac, domain, fileName, 3600);
+
+            }
+
+
+            return string.Empty;
+        }
+
+
+
+        //MiRefresh_Click
+        private void MiRefresh_Click(object sender, RoutedEventArgs e)
+        {
+          Search();
+
+        }
         /// <summary>
         /// 上传
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private  void btnUpload_Click(object sender, RoutedEventArgs e)
+        private void btnUpload_Click(object sender, RoutedEventArgs e)
         {
             var ofd = new System.Windows.Forms.OpenFileDialog
             {
