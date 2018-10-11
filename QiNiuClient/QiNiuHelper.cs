@@ -6,6 +6,7 @@ using Qiniu.Http;
 using Qiniu.Util;
 using System.Collections.Generic;
 using System.Text;
+using Qiniu.CDN;
 using Qiniu.Storage;
 
 namespace QiNiuClient
@@ -58,7 +59,13 @@ namespace QiNiuClient
             return dt.ToString("yyyy/MM/dd HH:mm:ss");
         }
 
+        public static bool CdnRefresh(Mac mac,string[] urls)
+        {
+            CdnManager cdnMgr = new CdnManager(mac);
+            var result = cdnMgr.RefreshUrls(urls);
+            return result.Code == 200;
 
-      
+        }
+
     }
 }

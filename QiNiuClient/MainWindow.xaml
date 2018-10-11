@@ -15,6 +15,7 @@
             <MenuItem  Header="复制文件名" Click="MICopyFileName_Click" />
             <MenuItem  Header="复制下载地址" Click="MICopyNetAddress_Click" />
             <MenuItem  Header="复制下载地址(Token)" Click="MICopyNetAddressWithToken_Click" />
+            <MenuItem  Header="刷新下载地址" Click="MIRefreshNetAddress_Click" />
         </ContextMenu> 
     </Window.Resources>
     <Grid>

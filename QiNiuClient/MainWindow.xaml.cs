@@ -567,6 +567,65 @@ namespace QiNiuClient
 
         }
 
+        //MIRefreshNetAddress_Click
+
+        private void MIRefreshNetAddress_Click(object sender, RoutedEventArgs e)
+        {
+            RefreshNetAddress();
+
+        }
+
+        private void RefreshNetAddress()
+        {
+            if (dgResult.ItemsSource == null && dgResult.SelectedItems.Count <= 0)
+            {
+                return;
+
+            }
+
+            List<QiNiuFileInfo> list = new List<QiNiuFileInfo>();
+            foreach (var item in dgResult.SelectedItems)
+            {
+                QiNiuFileInfo info = (QiNiuFileInfo)item;
+                if (info != null)
+                {
+                    list.Add(info);
+                }
+            }
+            if (list.Count > 0)
+            {
+             
+                string[] urls=new string[list.Count];
+                for (var i = 0; i < list.Count; i++)
+                {
+                    QiNiuFileInfo qiNiuFileInfo = list[i];
+                    
+                    urls[i]= GetPublishUrl(qiNiuFileInfo.FileName);
+                }
+              
+                MessageBox.Show(QiNiuHelper.CdnRefresh(mac, urls) ? "文件刷新成功" : "文件刷新失败");
+              
+            }
+        }
+
+
+        //todo:设置或更新文件的生存时间
+
+
+        //// 存储空间名
+        //string Bucket = "7qiniu";
+        //// 文件名
+        //string key = "0_01.png";
+        //HttpResult expireRet = bucketManager.DeleteAfterDays(Bucket, key, 7);
+        //    if (expireRet.Code != (int) HttpCode.OK)
+        //{
+        //    Console.WriteLine("deleteAfterDays error: " + expireRet.ToString());
+        //}
+        //Console.WriteLine(expireRet.ToString());
+
+        
+
+
         private void GetNetAddress(bool isPrivate=false)
         {
             if (dgResult.ItemsSource == null && dgResult.SelectedItems.Count <= 0)
