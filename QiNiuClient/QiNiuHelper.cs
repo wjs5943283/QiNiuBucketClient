@@ -59,13 +59,63 @@ namespace QiNiuClient
             return dt.ToString("yyyy/MM/dd HH:mm:ss");
         }
 
-        public static bool CdnRefresh(Mac mac,string[] urls)
+        public static bool RefreshUrls(Mac mac,string[] urls)
         {
             CdnManager cdnMgr = new CdnManager(mac);
             var result = cdnMgr.RefreshUrls(urls);
             return result.Code == 200;
-
+           
         }
 
+        public static bool RefreshDirs(Mac mac, string[] urls)
+        {
+            CdnManager cdnMgr = new CdnManager(mac);
+            var result = cdnMgr.RefreshDirs(urls);
+            return result.Code == 200;
+           
+        }
+
+        public static bool PrefetchUrls(Mac mac, string[] urls,out string Result)
+        {
+            StringBuilder sb = new StringBuilder();
+            CdnManager cdnMgr = new CdnManager(mac);
+            var result = cdnMgr.PrefetchUrls(urls);
+
+
+            sb.AppendLine($"Code:{result.Result.Code}");
+            if (result.Result.InvalidUrls != null)
+            {
+                sb.AppendLine($"InvalidUrls:");
+                foreach (string url in result.Result.InvalidUrls)
+                {
+                    sb.Append(url + " ");
+                }
+            }
+          
+            if (result.Code == 200)
+            {
+
+                if (!string.IsNullOrWhiteSpace(result.Result.RequestId))
+                {
+                    sb.AppendLine($"RequestId:{result.Result.RequestId}");
+                }
+                sb.AppendLine($"每日的预取 url 限额quotaDay:{result.Result.QuotaDay}");
+                sb.AppendLine($"剩余的预取 url 限额surplusDay:{result.Result.SurplusDay}");
+
+                Result = sb.ToString();
+                return true;
+            }
+
+            if (!string.IsNullOrWhiteSpace(result.Result.Error))
+            {
+                sb.AppendLine($"Error:{result.Result.Error}");
+            }
+
+            Result = sb.ToString();
+                return false;
+          
+
+           // cdnMgr.RefreshUrlsAndDirs()
+        }
     }
 }

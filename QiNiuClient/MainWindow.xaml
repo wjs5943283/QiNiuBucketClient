@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:QiNiuClient"
         mc:Ignorable="d"
-        Title="七牛存储管理客户端" Height="601" Width="709" Loaded="Window_Loaded" Icon="1.ico">
+        Title="七牛存储管理客户端" Height="597" Width="708" Loaded="Window_Loaded" Icon="1.ico">
     <Window.Resources>
         <ContextMenu x:Key="ContextMenu">
             <MenuItem  Header="刷新" Click="MiRefresh_Click" />
@@ -15,56 +15,81 @@
             <MenuItem  Header="复制文件名" Click="MICopyFileName_Click" />
             <MenuItem  Header="复制下载地址" Click="MICopyNetAddress_Click" />
             <MenuItem  Header="复制下载地址(Token)" Click="MICopyNetAddressWithToken_Click" />
+            <MenuItem  Header="修改删除天数" Click="MIEditDeleteAfterDays_Click" />
             <MenuItem  Header="刷新下载地址" Click="MIRefreshNetAddress_Click" />
-        </ContextMenu> 
+
+        </ContextMenu>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="97*"/>
-            <RowDefinition Height="190*"/>
+            <RowDefinition Height="112*"/>
+            <RowDefinition Height="387*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <TextBox Name="TxtAK" HorizontalAlignment="Left" Height="23" Margin="87,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="589" Grid.Column="1"/>
+        <TextBox Name="TxtAK" HorizontalAlignment="Left" Height="23" Margin="87,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="611" Grid.Column="1"/>
         <Label  Content="Access Key:" HorizontalAlignment="Left" Margin="11,10,0,0" VerticalAlignment="Top" Height="24" Width="76" Grid.Column="1"/>
-        <TextBox Name="TxtSk" HorizontalAlignment="Left" Height="23" Margin="87,39,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="589" Grid.Column="1"/>
+        <TextBox Name="TxtSk" HorizontalAlignment="Left" Height="23" Margin="87,39,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="611" Grid.Column="1"/>
         <Label Content="Secret Key:" HorizontalAlignment="Left" Margin="11,39,0,0" VerticalAlignment="Top" Height="24" Width="76" Grid.Column="1" RenderTransformOrigin="1.368,4.625"/>
-        <Button Name="BtnConnet" Content="连接" HorizontalAlignment="Left" Margin="254,70,0,0" VerticalAlignment="Top" Width="81" Click="BtnConnet_Click" Height="21" Grid.Column="1"/>
-        <ComboBox Name="SyncTargetBucketsComboBox" HorizontalAlignment="Left" Margin="445,70,0,0" VerticalAlignment="Top" Width="143" Height="22" SelectionChanged="SyncTargetBucketsComboBox_SelectionChanged" RenderTransformOrigin="-0.21,0.591" Grid.Column="1"/>
-        <Label Content="存储空间列表:" HorizontalAlignment="Left" Margin="352,70,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.487,4.042" Height="24" Width="88" Grid.Column="1"/>
-        <Label Content="区      域:" HorizontalAlignment="Left" Margin="11,70,0,0" VerticalAlignment="Top" Height="24" Width="76" Grid.Column="1"/>
-        <ComboBox Name="AreaComboBox" HorizontalAlignment="Left" Margin="87,70,0,0" VerticalAlignment="Top" Width="151" RenderTransformOrigin="1.479,0.455" Height="22" Grid.Column="1"/>
-        <TextBox Name="txtStartWith" HorizontalAlignment="Left" Height="23" Margin="88,103,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="71" Grid.Column="1"/>
-        <Button Name="btnSearch" Content="查询" HorizontalAlignment="Left" Margin="304,105,0,0" VerticalAlignment="Top" Width="82" Height="21" RenderTransformOrigin="-4,0.429" Click="btnSearch_Click" Grid.Column="1" IsEnabled="False"/>
-        <Label Content="StartWith:" HorizontalAlignment="Left" Margin="11,102,0,0" VerticalAlignment="Top" Height="24" Width="76" RenderTransformOrigin="0.5,2.667" Grid.Column="1"/>
-        <TextBox Name="txtEndWith" HorizontalAlignment="Left" Height="23" Margin="221,103,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="73" Grid.Column="1"/>
-        <Label Content="EndWith:" HorizontalAlignment="Left" Margin="162,102,0,0" VerticalAlignment="Top" Height="24" Width="76" RenderTransformOrigin="0.5,2.667" Grid.Column="1"/>
-        <DataGrid ContextMenu="{StaticResource ContextMenu}" Name="dgResult" Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False" Grid.ColumnSpan="2">
-                   
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="序号" Binding="{Binding Num}"></DataGridTextColumn>
-                <DataGridTextColumn  Header="文件名" Binding="{Binding FileName}" />
-                <DataGridTextColumn Header="文件类型" Binding="{Binding FileType}" />
-                <DataGridTextColumn Header="存储类型" Binding="{Binding StorageType}"/>
-                <DataGridTextColumn Header="文件大小" Binding="{Binding FileSize}"/>
-                <DataGridTextColumn Header="最后更新" Binding="{Binding CreateDate}"/>
-                <DataGridTextColumn Header="终端用户" Binding="{Binding EndUser}"></DataGridTextColumn>
+        <TabControl Grid.Column="1" HorizontalAlignment="Left" Height="502" Margin="0,68,0,0" VerticalAlignment="Top" Width="698" Grid.RowSpan="2">
+            <TabItem Header="存储" Margin="-2,-2,-24,-2">
+                <Grid Background="#FFE5E5E5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="97*"/>
+                        <ColumnDefinition Width="682*"/>
+                    </Grid.ColumnDefinitions>
+                    <CheckBox x:Name="cbOverlay" Content="覆盖上传" HorizontalAlignment="Left" Margin="33,100,0,0" VerticalAlignment="Top" RenderTransformOrigin="-14.718,5.143" Height="14" Width="71" Grid.ColumnSpan="2"/>
+                    <CheckBox x:Name="cbResume" Content="大文件上传" HorizontalAlignment="Left" Margin="115,100,0,0" VerticalAlignment="Top" RenderTransformOrigin="-14.718,5.143" Height="14" Width="90" Grid.Column="1"/>
+                    <Label Content="天后删除" HorizontalAlignment="Left" Margin="55,95,0,0" VerticalAlignment="Top" Height="24" Width="60" RenderTransformOrigin="1.368,4.625" Grid.Column="1"/>
+                    <ProgressBar x:Name="pb1" HorizontalAlignment="Left" Height="19" Margin="211,98,0,0" VerticalAlignment="Top" Width="143" Grid.Column="1"/>
+                    <TextBox x:Name="txtDelAfDays" HorizontalAlignment="Left" Height="23" Margin="22,96,0,0" TextWrapping="Wrap" Text="365" VerticalAlignment="Top" Width="37" Grid.Column="1"/>
+                    <Button x:Name="BtnConnet" Content="连接" HorizontalAlignment="Left" Margin="159,19,0,0" VerticalAlignment="Top" Width="81" Click="BtnConnet_Click" Height="21" Grid.Column="1"/>
+                    <ComboBox x:Name="SyncTargetBucketsComboBox" HorizontalAlignment="Left" Margin="350,19,0,0" VerticalAlignment="Top" Width="143" Height="22" SelectionChanged="SyncTargetBucketsComboBox_SelectionChanged" RenderTransformOrigin="-0.21,0.591" Grid.Column="1"/>
+                    <Label Content="存储空间列表:" HorizontalAlignment="Left" Margin="257,19,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.487,4.042" Height="24" Width="88" Grid.Column="1"/>
+                    <Label Content="区      域:" HorizontalAlignment="Left" Margin="13,19,0,0" VerticalAlignment="Top" Height="24" Width="76" Grid.ColumnSpan="2"/>
+                    <ComboBox x:Name="AreaComboBox" HorizontalAlignment="Left" Margin="79,19,0,0" VerticalAlignment="Top" Width="151" RenderTransformOrigin="1.479,0.455" Height="22" Grid.ColumnSpan="2"/>
+                    <TextBox x:Name="txtStartWith" HorizontalAlignment="Left" Height="23" Margin="80,52,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="71" Grid.ColumnSpan="2"/>
+                    <Button x:Name="btnSearch" Content="查询" HorizontalAlignment="Left" Margin="209,54,0,0" VerticalAlignment="Top" Width="82" Height="21" RenderTransformOrigin="-4,0.429" Click="btnSearch_Click" IsEnabled="False" Grid.Column="1"/>
+                    <Label Content="StartWith:" HorizontalAlignment="Left" Margin="13,51,0,0" VerticalAlignment="Top" Height="24" Width="76" RenderTransformOrigin="0.5,2.667" Grid.ColumnSpan="2"/>
+                    <TextBox x:Name="txtEndWith" HorizontalAlignment="Left" Height="23" Margin="126,52,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="73" Grid.Column="1"/>
+                    <Label Content="EndWith:" HorizontalAlignment="Left" Margin="67,51,0,0" VerticalAlignment="Top" Height="24" Width="76" RenderTransformOrigin="0.5,2.667" Grid.Column="1"/>
+                    <Button x:Name="btnUpload" Content="上传"  IsEnabled="False" HorizontalAlignment="Left" Margin="313,53,0,0" VerticalAlignment="Top" Width="75" Height="21" RenderTransformOrigin="-2,2.381" Click="btnUpload_Click" Grid.Column="1"/>
+                    <Button x:Name="btnBatchDel" Content="删除"  IsEnabled="False" HorizontalAlignment="Left" Margin="506,53,0,0" VerticalAlignment="Top" Width="75" Height="21" Click="btnBatchDel_Click" Grid.Column="1"/>
+                    <Button x:Name="btnBatchDownload" Content="下载"  IsEnabled="False" HorizontalAlignment="Left" Margin="407,53,0,0" VerticalAlignment="Top" Width="75" Height="21" RenderTransformOrigin="-0.813,0.619" Click="btnBatchDownload_Click" Grid.Column="1"/>
+                    <GroupBox Header="上传设置 " HorizontalAlignment="Left" Height="53" Margin="13,78,0,0" VerticalAlignment="Top" Width="665" Grid.ColumnSpan="2"/>
+                    <DataGrid ContextMenu="{StaticResource ResourceKey=ContextMenu}" x:Name="dgResult" AutoGenerateColumns="False" CanUserAddRows="False" Margin="9,138,10,10" RenderTransformOrigin="0.488,1.726" Grid.ColumnSpan="2">
 
-            </DataGrid.Columns>
-        </DataGrid>
-        <Button Name="btnUpload" Content="上传"  IsEnabled="False" HorizontalAlignment="Left" Margin="408,104,0,0" VerticalAlignment="Top" Width="75" Height="21" RenderTransformOrigin="-2,2.381" Click="btnUpload_Click" Grid.Column="1"/>
-        <Button Name="btnBatchDel" Content="删除"  IsEnabled="False" HorizontalAlignment="Left" Margin="601,104,0,0" VerticalAlignment="Top" Width="75" Height="21" Click="btnBatchDel_Click" Grid.Column="1"/>
-        <Button Name="btnBatchDownload" Content="下载"  IsEnabled="False" HorizontalAlignment="Left" Margin="502,104,0,0" VerticalAlignment="Top" Width="75" Height="21" RenderTransformOrigin="-0.813,0.619" Click="btnBatchDownload_Click" Grid.Column="1"/>
-        <CheckBox Name="cbOverlay" Content="覆盖上传" HorizontalAlignment="Left" Margin="31,159,0,0" VerticalAlignment="Top" Grid.Column="1" RenderTransformOrigin="-14.718,5.143" Height="14" Width="71"/>
-        <CheckBox Name="cbResume" Content="大文件上传" HorizontalAlignment="Left" Margin="204,159,0,0" VerticalAlignment="Top" Grid.Column="1" RenderTransformOrigin="-14.718,5.143" Height="14" Width="90"/>
-        <GroupBox Grid.ColumnSpan="2" Header="上传设置 " HorizontalAlignment="Left" Height="58" Margin="11,131,0,0" VerticalAlignment="Top" Width="665">
-            <TextBox x:Name="txtDelAfDays" HorizontalAlignment="Left" Height="23" Margin="88,10,0,0" TextWrapping="Wrap" Text="365" VerticalAlignment="Top" Width="37"/>
-        </GroupBox>
-        <Label Content="天后删除" HorizontalAlignment="Left" Margin="139,154,0,0" VerticalAlignment="Top" Height="24" Width="60" Grid.Column="1" RenderTransformOrigin="1.368,4.625"/>
-        <ProgressBar Name="pb1"  Grid.Column="1" HorizontalAlignment="Left" Height="19" Margin="340,154,0,0" VerticalAlignment="Top" Width="143"/>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="序号" Binding="{Binding Num}"/>
+                            <DataGridTextColumn  Header="文件名" Binding="{Binding FileName}" />
+                            <DataGridTextColumn Header="文件类型" Binding="{Binding FileType}" />
+                            <DataGridTextColumn Header="存储类型" Binding="{Binding StorageType}"/>
+                            <DataGridTextColumn Header="文件大小" Binding="{Binding FileSize}"/>
+                            <DataGridTextColumn Header="最后更新" Binding="{Binding CreateDate}"/>
+                            <DataGridTextColumn Header="终端用户" Binding="{Binding EndUser}"/>
+
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="融合CDN" Margin="25,-9,-57,-4">
+                <Grid Background="#FFE5E5E5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="18*"/>
+                        <ColumnDefinition Width="16*"/>
+                        <ColumnDefinition Width="665*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="btnRefreshUrlsCdn" Content="文件刷新" Grid.Column="2" HorizontalAlignment="Left" Margin="10,150,0,0" VerticalAlignment="Top" Width="69" RenderTransformOrigin="0.472,1.619" Click="btnRefreshUrlsCdn_Click"/>
+                    <TextBox Name="txtRefreshCdn" HorizontalAlignment="Left" Height="123" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="668" Grid.ColumnSpan="3"  AcceptsReturn="True" VerticalScrollBarVisibility="Visible"/>
+                    <Button x:Name="btnPrefetchUrlsCdn" Content="文件预取" Grid.Column="2" HorizontalAlignment="Left" Margin="158,150,0,0" VerticalAlignment="Top" Width="74" RenderTransformOrigin="0.472,1.619" Click="btnPrefetchUrlsCdn_Click"/>
+                    <Button x:Name="btnRefreshDirsCdn" Content="目录刷新" Grid.Column="2" HorizontalAlignment="Left" Margin="84,150,0,0" VerticalAlignment="Top" Width="69" RenderTransformOrigin="0.472,1.619" Click="btnRefreshDirsCdn_Click"/>
+                    <TextBox x:Name="txtResultCdn" HorizontalAlignment="Left" Height="123" Margin="10,186,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="668" Grid.ColumnSpan="3"  AcceptsReturn="True" VerticalScrollBarVisibility="Visible"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
 
     </Grid>
-   
+
 </Window>

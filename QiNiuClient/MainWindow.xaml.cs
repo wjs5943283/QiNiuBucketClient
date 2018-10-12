@@ -574,6 +574,53 @@ namespace QiNiuClient
             RefreshNetAddress();
 
         }
+        /// <summary>
+        /// MIEditDeleteAfterDays_Click
+        /// </summary>
+        private void MIEditDeleteAfterDays_Click(object sender, RoutedEventArgs e)
+        {
+            EditDeleteAfterDays();
+
+        }
+
+        /// <summary>
+        /// 修改DeleteAfterDays
+        /// </summary>
+        private void EditDeleteAfterDays()
+        {
+            if (dgResult.ItemsSource == null && dgResult.SelectedItems.Count <= 0)
+            {
+                return;
+
+            }
+
+            List<QiNiuFileInfo> list = new List<QiNiuFileInfo>();
+            foreach (var item in dgResult.SelectedItems)
+            {
+                QiNiuFileInfo info = (QiNiuFileInfo)item;
+                if (info != null)
+                {
+                    list.Add(info);
+                }
+            }
+            if (list.Count > 0)
+            {
+                string[] urls = new string[list.Count];
+                qiNiuClientCfg.DeleteAfterDays = Convert.ToInt32(txtDelAfDays.Text.Trim());
+                StringBuilder sb = new StringBuilder();
+                foreach (QiNiuFileInfo qiNiuFileInfo in list)
+                {
+                    HttpResult expireRet = bucketManager.DeleteAfterDays(bucket, qiNiuFileInfo.FileName, qiNiuClientCfg.DeleteAfterDays.Value);
+                    sb.AppendLine(expireRet.Code != (int)HttpCode.OK
+                        ? $"{qiNiuFileInfo.FileName}:修改删除时间失败！"
+                        : $"{qiNiuFileInfo.FileName}:修改删除时间成功！");
+                }
+
+                MessageBox.Show(sb.ToString());
+
+               
+            }
+        }
 
         private void RefreshNetAddress()
         {
@@ -594,36 +641,22 @@ namespace QiNiuClient
             }
             if (list.Count > 0)
             {
-             
-                string[] urls=new string[list.Count];
+                string[] urls = new string[list.Count];
                 for (var i = 0; i < list.Count; i++)
                 {
                     QiNiuFileInfo qiNiuFileInfo = list[i];
-                    
-                    urls[i]= GetPublishUrl(qiNiuFileInfo.FileName);
+
+                    urls[i] = GetPublishUrl(qiNiuFileInfo.FileName);
                 }
-              
-                MessageBox.Show(QiNiuHelper.CdnRefresh(mac, urls) ? "文件刷新成功" : "文件刷新失败");
-              
+
+                MessageBox.Show(QiNiuHelper.RefreshUrls(mac, urls) ? "文件刷新成功" : "文件刷新失败");
+
+
             }
         }
 
 
-        //todo:设置或更新文件的生存时间
-
-
-        //// 存储空间名
-        //string Bucket = "7qiniu";
-        //// 文件名
-        //string key = "0_01.png";
-        //HttpResult expireRet = bucketManager.DeleteAfterDays(Bucket, key, 7);
-        //    if (expireRet.Code != (int) HttpCode.OK)
-        //{
-        //    Console.WriteLine("deleteAfterDays error: " + expireRet.ToString());
-        //}
-        //Console.WriteLine(expireRet.ToString());
-
-        
+       
 
 
         private void GetNetAddress(bool isPrivate=false)
@@ -967,6 +1000,79 @@ namespace QiNiuClient
             return false;
         }
 
+        private void btnRefreshUrlsCdn_Click(object sender, RoutedEventArgs e)
+        {
+            string s = txtRefreshCdn.Text;
+            if (string.IsNullOrWhiteSpace(s))
+            {
+                MessageBox.Show("请输入要刷新的地址");
+                txtRefreshCdn.Focus();
+                return;
+            }
+            string[] urls = s.Split(new char[] {',', '，', ' ', '\t', '\r', '\n', ';', '；'},
+                StringSplitOptions.RemoveEmptyEntries);
+            if (urls.Length <= 0)
+            {
+                MessageBox.Show("请输入要刷新的地址");
+                txtRefreshCdn.Focus();
+                return;
+            }
+            MessageBox.Show(QiNiuHelper.RefreshUrls(new Mac(TxtAK.Text.Trim(), TxtSk.Text.Trim()), urls)
+                ? "刷新成功！"
+                : "刷新失败！");
+
+        }
+
+        private void btnPrefetchUrlsCdn_Click(object sender, RoutedEventArgs e)
+        {
+            string s = txtRefreshCdn.Text;
+            if (string.IsNullOrWhiteSpace(s))
+            {
+                MessageBox.Show("请输入要预取的地址");
+                txtRefreshCdn.Focus();
+                return;
+            }
+            string[] urls = s.Split(new char[] { ',', '，', ' ', '\t', '\r', '\n', ';', '；' },
+                StringSplitOptions.RemoveEmptyEntries);
+            if (urls.Length <= 0)
+            {
+                MessageBox.Show("请输入要预取的地址");
+                txtRefreshCdn.Focus();
+                return;
+            }
+            string res;
+            MessageBox.Show(QiNiuHelper.PrefetchUrls(new Mac(TxtAK.Text.Trim(), TxtSk.Text.Trim()), urls,out res)
+                ? "文件预取成功！"
+                : "文件预取失败！");
+            if (!string.IsNullOrWhiteSpace(res))
+            {
+                txtResultCdn.Text = res;
+            }
+
+
+        }
+
+        private void btnRefreshDirsCdn_Click(object sender, RoutedEventArgs e)
+        {
+            string s = txtRefreshCdn.Text;
+            if (string.IsNullOrWhiteSpace(s))
+            {
+                MessageBox.Show("请输入要刷新的地址");
+                txtRefreshCdn.Focus();
+                return;
+            }
+            string[] urls = s.Split(new char[] { ',', '，', ' ', '\t', '\r', '\n', ';', '；' },
+                StringSplitOptions.RemoveEmptyEntries);
+            if (urls.Length <= 0)
+            {
+                MessageBox.Show("请输入要刷新的地址");
+                txtRefreshCdn.Focus();
+                return;
+            }
+            MessageBox.Show(QiNiuHelper.RefreshDirs(new Mac(TxtAK.Text.Trim(), TxtSk.Text.Trim()), urls)
+                ? "刷新成功！"
+                : "刷新失败！");
+        }
     }
 }
   
