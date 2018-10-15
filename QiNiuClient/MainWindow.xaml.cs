@@ -100,6 +100,9 @@ namespace QiNiuClient
 
             }
 
+            ConnectServer();
+
+
             //#region 居中显示
 
             //double screeHeight = SystemParameters.FullPrimaryScreenHeight;
@@ -126,6 +129,11 @@ namespace QiNiuClient
             //    MessageBox.Show(zone.ApiHost);
             //}
             //return;
+            ConnectServer();
+        }
+
+        private void ConnectServer()
+        {
             if (SyncTargetBucketsComboBox.Items.Count > 0)
             {
                 SyncTargetBucketsComboBox.ItemsSource = null;
@@ -166,7 +174,6 @@ namespace QiNiuClient
 
             Thread.Sleep(10);
         }
-        
         /// <summary>
         /// 加载进度条
         /// </summary>
