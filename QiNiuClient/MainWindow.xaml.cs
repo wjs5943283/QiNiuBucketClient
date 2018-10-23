@@ -102,16 +102,6 @@ namespace QiNiuClient
 
             ConnectServer();
 
-
-            //#region 居中显示
-
-            //double screeHeight = SystemParameters.FullPrimaryScreenHeight;
-            //double screeWidth = SystemParameters.FullPrimaryScreenWidth;
-            //Top = (screeHeight - this.Height) / 2;
-            //Left = (screeWidth - this.Width) / 2;
-
-            //#endregion
-
             marker = "";
           
         }
@@ -417,7 +407,11 @@ namespace QiNiuClient
                 
                     foreach (QiNiuFileInfo info in qiNiuFileInfolist)
                     {
-                        string pubfile = DownloadManager.CreatePublishUrl(domain, info.FileName);
+                    // string pubfile = DownloadManager.CreatePublishUrl(domain, info.FileName);
+
+                        string pubfile = GetPublishUrl(info.FileName);
+
+
                         string saveFile = Path.Combine(fileSaveDir, info.FileName.Replace('/', '-'));
                         if (File.Exists(saveFile))
                         {
@@ -716,7 +710,33 @@ namespace QiNiuClient
                 //string privateUrl = DownloadManager.CreatePrivateUrl(mac, domain, key, 3600);
 
                 domain = config.UseHttps ? "https://" + domain : "http://" + domain;
+
+                if ((domain.StartsWith(".")|| domain.StartsWith("*.")) &&fileName.Contains("/"))
+                {
+                    string[] strs = fileName.Split(new char[] {'/'});
+                    if (strs.Length == 2)
+                    {
+                        if (domain.StartsWith("*."))
+                        {
+                            domain = domain.Replace("*", strs[0]);
+                          
+                        }
+                        if (domain.StartsWith("."))
+                        {
+                            domain = strs[0] + domain;
+                        }
+                       
+                        return DownloadManager.CreatePublishUrl(domain, strs[1]);
+                    }
+
+                }
+
+
                 return DownloadManager.CreatePublishUrl(domain, fileName);
+
+
+
+
               // string prvfile= DownloadManager.CreatePrivateUrl(mac, domain, fileName, 3600);
 
             }
