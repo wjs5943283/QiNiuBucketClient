@@ -14,6 +14,7 @@ using System.Windows;
 
 
 
+
 namespace QiNiuClient
 {
     /// <summary>
@@ -758,6 +759,25 @@ namespace QiNiuClient
         /// <param name="e"></param>
         private void btnUpload_Click(object sender, RoutedEventArgs e)
         {
+            if (cbDelete.IsChecked == true)
+            {
+                try
+                {
+                    qiNiuClientCfg.DeleteAfterDays = Convert.ToInt32(txtDelAfDays.Text.Trim());
+                }
+                catch (Exception)
+                {
+                    qiNiuClientCfg.DeleteAfterDays = null;
+                }
+                
+            }
+            else
+            {
+                qiNiuClientCfg.DeleteAfterDays = null;
+            }
+
+
+
             var ofd = new System.Windows.Forms.OpenFileDialog
             {
                 Multiselect = true,
@@ -771,8 +791,7 @@ namespace QiNiuClient
             {
                 return;
             }
-
-            qiNiuClientCfg.DeleteAfterDays = Convert.ToInt32(txtDelAfDays.Text.Trim());
+           
 
             string json = JsonConvert.SerializeObject(qiNiuClientCfg);
             File.WriteAllText("QiNiuClientCfg.Json", json);
@@ -931,7 +950,10 @@ namespace QiNiuClient
                     putPolicy.Scope = bucket;
                 }
                 putPolicy.SetExpires(3600);
-                putPolicy.DeleteAfterDays = qiNiuClientCfg.DeleteAfterDays ?? 365;
+               
+                    putPolicy.DeleteAfterDays = qiNiuClientCfg.DeleteAfterDays ;
+                
+                
                 string token = Auth.CreateUploadToken(mac, putPolicy.ToJsonString());
              
                 ResumableUploader target = new ResumableUploader(config);
@@ -985,7 +1007,10 @@ namespace QiNiuClient
                     putPolicy.Scope = bucket;
                 }
                 putPolicy.SetExpires(3600);
-                putPolicy.DeleteAfterDays = qiNiuClientCfg.DeleteAfterDays ?? 365;
+                
+                    putPolicy.DeleteAfterDays = qiNiuClientCfg.DeleteAfterDays ;
+                
+               
                 string token = Auth.CreateUploadToken(mac, putPolicy.ToJsonString());
                 UploadManager um = new UploadManager(config);
                 HttpResult result = um.UploadFile(file, key, token, null);
@@ -1078,6 +1103,58 @@ namespace QiNiuClient
             MessageBox.Show(QiNiuHelper.RefreshDirs(new Mac(TxtAK.Text.Trim(), TxtSk.Text.Trim()), urls)
                 ? "刷新成功！"
                 : "刷新失败！");
+        }
+
+       /// <summary>
+       /// 预览（右击）
+       /// </summary>
+       /// <param name="sender"></param>
+       /// <param name="e"></param>
+        private void MiPreview_Click(object sender, RoutedEventArgs e)
+        {
+            Preview();
+
+        }
+        /// <summary>
+        /// 预览
+        /// </summary>
+        private void Preview()
+        {
+            if (dgResult.ItemsSource == null && dgResult.SelectedItems.Count <= 0)
+            {
+                return;
+
+            }
+
+            List<QiNiuFileInfo> list = new List<QiNiuFileInfo>();
+            foreach (var item in dgResult.SelectedItems)
+            {
+                QiNiuFileInfo info = (QiNiuFileInfo)item;
+                if (info != null)
+                {
+                    list.Add(info);
+                }
+            }
+            if (list.Count > 0)
+            {
+                //todo:显示预览窗口
+
+                //1.获得文件地址
+
+
+                ImageView imageView = new ImageView { Mode = 0, Width = 200, Height = 200, Quality = 90, Format = "gif" };
+               
+
+
+
+                PreviewWindow pw = new PreviewWindow
+                {
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Owner = this
+                };
+
+                pw.ShowDialog();
+            }
         }
     }
 }

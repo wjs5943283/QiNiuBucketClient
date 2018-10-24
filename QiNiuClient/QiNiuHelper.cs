@@ -116,6 +116,16 @@ namespace QiNiuClient
           
 
            // cdnMgr.RefreshUrlsAndDirs()
+
+
+           
+        }
+
+
+        public static bool IsImage(string path)
+        {
+            System.Drawing.Image img = System.Drawing.Image.FromFile(path);
+            return img.RawFormat.Equals(System.Drawing.Imaging.ImageFormat.Jpeg);
         }
     }
 }
