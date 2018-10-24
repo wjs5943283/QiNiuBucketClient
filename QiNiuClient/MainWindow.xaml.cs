@@ -704,46 +704,25 @@ namespace QiNiuClient
         {
             if (domainsResult.Result.Count > 0)
             {
-
+                
                 string domain = domainsResult.Result[0];
-                //string key = "hello/world/七牛/test.png";
-                //string privateUrl = DownloadManager.CreatePrivateUrl(mac, domain, key, 3600);
 
-                domain = config.UseHttps ? "https://" + domain : "http://" + domain;
-
-                if ((domain.StartsWith(".")|| domain.StartsWith("*.")) &&fileName.Contains("/"))
+                if (domain.StartsWith(".") && !string.IsNullOrWhiteSpace(bucket))
                 {
-                    string[] strs = fileName.Split(new char[] {'/'});
-                    if (strs.Length == 2)
-                    {
-                        if (domain.StartsWith("*."))
-                        {
-                            domain = domain.Replace("*", strs[0]);
-                          
-                        }
-                        if (domain.StartsWith("."))
-                        {
-                            domain = strs[0] + domain;
-                        }
-                       
-                        return DownloadManager.CreatePublishUrl(domain, strs[1]);
-                    }
-
+                    domain = bucket + domain;
                 }
-
-
-                return DownloadManager.CreatePublishUrl(domain, fileName);
-
-
-
-
-              // string prvfile= DownloadManager.CreatePrivateUrl(mac, domain, fileName, 3600);
-
+                string domainUrl = config.UseHttps ? "https://" + domain : "http://" + domain;
+        
+                return DownloadManager.CreatePublishUrl(domainUrl, fileName);
+              
             }
 
 
-            return string.Empty;
+            throw new Exception("无法获得空间域名");
+
         }
+
+
 
         private string GetPrivateUrl(string fileName)
         {
@@ -996,7 +975,7 @@ namespace QiNiuClient
             {
                 string key = Path.GetFileName(file);
                 //上传限制10M
-                putPolicy.FsizeLimit = 1024 * 1024 * 10;
+                putPolicy.FsizeLimit = 1024 * 1024 * 100;
                 if (overlay)
                 {
                     putPolicy.Scope = bucket + ":" + key;
