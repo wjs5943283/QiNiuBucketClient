@@ -29,9 +29,11 @@ namespace QiNiuClient
         private void Image_Loaded(object sender, RoutedEventArgs e)
         {
             ImageBox.Source=new BitmapImage(new Uri("no-prev.png",UriKind.Relative));
-            if (!string.IsNullOrWhiteSpace(PreviewFilePath)&&File.Exists(PreviewFilePath))
+            if (!string.IsNullOrWhiteSpace(PreviewFilePath))
             {
-                ImageBox.Source = new BitmapImage(new Uri(PreviewFilePath,UriKind.RelativeOrAbsolute));
+
+                ImageBox.Source = new BitmapImage(new Uri(PreviewFilePath));
+
             }
         }
     }

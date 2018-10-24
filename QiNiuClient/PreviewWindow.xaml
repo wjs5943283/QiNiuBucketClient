@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:QiNiuClient"
         mc:Ignorable="d"
-        Title="预览" Height="300" Width="400 ">
+        Title="预览" Height="249.152" Width="330.848">
     <Grid>
-        <Image Name="ImageBox" HorizontalAlignment="Left" Height="253" Margin="10,10,0,0" VerticalAlignment="Top" Width="372" Loaded="Image_Loaded" Stretch="Fill"/>
+        <Image Name="ImageBox" HorizontalAlignment="Left" Height="200" Margin="10,10,0,0" VerticalAlignment="Top" Width="300" Loaded="Image_Loaded" Stretch="Fill"/>
 
     </Grid>
 </Window>

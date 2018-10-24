@@ -1136,22 +1136,11 @@ namespace QiNiuClient
             }
             if (list.Count > 0)
             {
-                //todo:显示预览窗口
-
-                //1.获得文件地址
-
                 string address = string.Empty;
-
-                string add = GetPublishUrl(list[0].FileName);
-                if (File.Exists(add))
+                if (list[0].FileType.StartsWith("image"))
                 {
-                    if( QiNiuHelper.IsImage(add))
-                    address = string.Format("{0}?imageView2/2/w/308/h/210/interlace/1/q/100",add);
-                   
+                    address = GetPrivateUrl(list[0].FileName + "?imageView2/2/w/300/h/200/interlace/1/q/100");
                 }
-                
-                
-
                 PreviewWindow pw = new PreviewWindow
                 {
                     WindowStartupLocation = WindowStartupLocation.CenterOwner,
