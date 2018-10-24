@@ -11,10 +11,6 @@ using System.Threading;
 using System.Windows;
 
 
-
-
-
-
 namespace QiNiuClient
 {
     /// <summary>
@@ -100,8 +96,11 @@ namespace QiNiuClient
 
 
             }
-
-            ConnectServer();
+            if (!string.IsNullOrWhiteSpace(TxtAK.Text) && !string.IsNullOrWhiteSpace(TxtSk.Text))
+            {
+  ConnectServer();
+            }
+          
 
             marker = "";
           
@@ -741,7 +740,7 @@ namespace QiNiuClient
             }
 
 
-            return string.Empty;
+            throw new Exception("无法获得空间域名");
         }
 
 
@@ -1141,16 +1140,23 @@ namespace QiNiuClient
 
                 //1.获得文件地址
 
+                string address = string.Empty;
 
-                ImageView imageView = new ImageView { Mode = 0, Width = 200, Height = 200, Quality = 90, Format = "gif" };
-               
-
-
+                string add = GetPublishUrl(list[0].FileName);
+                if (File.Exists(add))
+                {
+                    if( QiNiuHelper.IsImage(add))
+                    address = string.Format("{0}?imageView2/2/w/308/h/210/interlace/1/q/100",add);
+                   
+                }
+                
+                
 
                 PreviewWindow pw = new PreviewWindow
                 {
                     WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                    Owner = this
+                    Owner = this,
+                    PreviewFilePath = address
                 };
 
                 pw.ShowDialog();
