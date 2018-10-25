@@ -1151,6 +1151,20 @@ namespace QiNiuClient
                 pw.ShowDialog();
             }
         }
+
+      
+
+        private void cbDelete_Click(object sender, RoutedEventArgs e)
+        {
+            if (cbDelete.IsChecked == true)
+            {
+                txtDelAfDays.IsEnabled = true;
+            }
+            else
+            {
+                txtDelAfDays.IsEnabled = false;
+            }
+        }
     }
 }
   

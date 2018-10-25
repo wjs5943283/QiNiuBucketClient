@@ -43,9 +43,9 @@
                     </Grid.ColumnDefinitions>
                     <CheckBox x:Name="cbOverlay" Content="覆盖上传" HorizontalAlignment="Left" Margin="33,100,0,0" VerticalAlignment="Top" RenderTransformOrigin="-14.718,5.143" Height="14" Width="71" Grid.ColumnSpan="2"/>
                     <CheckBox x:Name="cbResume" Content="大文件上传" HorizontalAlignment="Left" Margin="130,101,0,0" VerticalAlignment="Top" RenderTransformOrigin="-14.718,5.143" Height="14" Width="90" Grid.Column="1"/>
-                    <CheckBox x:Name="cbDelete" Content="天后删除" HorizontalAlignment="Left" Margin="60,101,0,0" VerticalAlignment="Top" Height="14" Width="90" RenderTransformOrigin="1.368,4.625" Grid.Column="1"></CheckBox>
+                    <CheckBox x:Name="cbDelete" Content="天后删除" HorizontalAlignment="Left" Margin="60,101,0,0" VerticalAlignment="Top" Height="14" Width="90" RenderTransformOrigin="1.368,4.625" Grid.Column="1" Click="cbDelete_Click"/>
                     <ProgressBar x:Name="pb1" HorizontalAlignment="Left" Height="19" Margin="226,98,0,0" VerticalAlignment="Top" Width="143" Grid.Column="1"/>
-                    <TextBox x:Name="txtDelAfDays" HorizontalAlignment="Left" Height="23" Margin="20,96,0,0" TextWrapping="Wrap" Text="365" VerticalAlignment="Top" Width="37" Grid.Column="1"/>
+                    <TextBox x:Name="txtDelAfDays" HorizontalAlignment="Left" Height="23" Margin="20,96,0,0" TextWrapping="Wrap" Text="365" VerticalAlignment="Top" Width="37" Grid.Column="1" IsEnabled="False"/>
                     <Button x:Name="BtnConnet" Content="连接" HorizontalAlignment="Left" Margin="159,19,0,0" VerticalAlignment="Top" Width="81" Click="BtnConnet_Click" Height="21" Grid.Column="1"/>
                     <ComboBox x:Name="SyncTargetBucketsComboBox" HorizontalAlignment="Left" Margin="350,19,0,0" VerticalAlignment="Top" Width="143" Height="22" SelectionChanged="SyncTargetBucketsComboBox_SelectionChanged" RenderTransformOrigin="-0.21,0.591" Grid.Column="1"/>
                     <Label Content="存储空间列表:" HorizontalAlignment="Left" Margin="257,19,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.487,4.042" Height="24" Width="88" Grid.Column="1"/>
