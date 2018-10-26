@@ -30,9 +30,9 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <TextBox Name="TxtAK" HorizontalAlignment="Left" Height="23" Margin="87,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="611" Grid.Column="1"/>
+        <TextBox Name="TxtAK" HorizontalAlignment="Left" Height="23" Margin="87,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="520" Grid.Column="1"/>
         <Label  Content="Access Key:" HorizontalAlignment="Left" Margin="11,10,0,0" VerticalAlignment="Top" Height="24" Width="76" Grid.Column="1"/>
-        <TextBox Name="TxtSk" HorizontalAlignment="Left" Height="23" Margin="87,39,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="611" Grid.Column="1"/>
+        <TextBox Name="TxtSk" HorizontalAlignment="Left" Height="23" Margin="87,39,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="520" Grid.Column="1"/>
         <Label Content="Secret Key:" HorizontalAlignment="Left" Margin="11,39,0,0" VerticalAlignment="Top" Height="24" Width="76" Grid.Column="1" RenderTransformOrigin="1.368,4.625"/>
         <TabControl Grid.Column="1" HorizontalAlignment="Left" Height="502" Margin="0,68,0,0" VerticalAlignment="Top" Width="700" Grid.RowSpan="2">
             <TabItem Header="存储" Margin="-2,0,-24,-4">
@@ -90,6 +90,8 @@
                 </Grid>
             </TabItem>
         </TabControl>
+        <Button x:Name="btnGetNowVersion" Content="最新版本" Grid.Column="1" HorizontalAlignment="Left" Margin="622,10,0,0" VerticalAlignment="Top" Width="68" Height="24" Click="btnGetNowVersion_Click"/>
+        <Button x:Name="btnOpenSource" Content="开源地址" Grid.Column="1" HorizontalAlignment="Left" Margin="622,38,0,0" VerticalAlignment="Top" Width="68" Height="24" Click="btnOpenSource_Click"/>
 
     </Grid>
 

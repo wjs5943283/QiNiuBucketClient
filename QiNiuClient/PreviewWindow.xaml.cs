@@ -31,8 +31,15 @@ namespace QiNiuClient
             ImageBox.Source=new BitmapImage(new Uri("no-prev.png",UriKind.Relative));
             if (!string.IsNullOrWhiteSpace(PreviewFilePath))
             {
-
-                ImageBox.Source = new BitmapImage(new Uri(PreviewFilePath));
+                try
+                {
+                    ImageBox.Source = new BitmapImage(new Uri(PreviewFilePath));
+                }
+                catch (Exception)
+                {
+                    ImageBox.Source = new BitmapImage(new Uri("no-prev.png", UriKind.Relative));
+                }
+               
 
             }
         }
