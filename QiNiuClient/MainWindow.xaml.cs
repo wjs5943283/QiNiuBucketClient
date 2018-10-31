@@ -36,6 +36,8 @@ namespace QiNiuClient
         private PutPolicy putPolicy;
         private StringBuilder uploadResult;
         private List<QiNiuFileInfo> qiNiuFileInfoList;
+        private string startWith;
+        private bool progressbarNeedStop;
 
         private delegate void SetProgressBarHandle(int value);
 
@@ -163,6 +165,7 @@ namespace QiNiuClient
             {
 
                 reloadBuckets();
+               
             });
 
             LoadProgressBar();
@@ -175,7 +178,7 @@ namespace QiNiuClient
         private void LoadProgressBar()
         {
             pb1.Visibility = Visibility.Visible;
-
+            progressbarNeedStop = false;
             ThreadPool.QueueUserWorkItem((state) =>
             {
                 int i = 1;
@@ -188,9 +191,14 @@ namespace QiNiuClient
                         i = 1;
                     }
                     SetProgressBar(i);
-                    Thread.Sleep(100);
+                    Thread.Sleep(200);
+                    if (progressbarNeedStop)
+                    {
+                        return;
+                        
+                    }
                 }
-
+                
             });
 
         }
@@ -253,6 +261,7 @@ namespace QiNiuClient
                     MessageBox.Show("连接失败！");
                 }));
             }
+            progressbarNeedStop = true;
         }
 
         private int num = 1;
@@ -280,64 +289,85 @@ namespace QiNiuClient
                 num = 1;
                 btnSearch.Content = "查询";
             }
-            else
-            {
-                btnSearch.Content = "加载更多";
-            }
+           
             bucket = SyncTargetBucketsComboBox.Text;
-            ListResult listResult = bucketManager.ListFiles(bucket, txtStartWith.Text, marker, 1000, "");
-            // DomainsResult domainsResult = bucketManager.Domains(SyncTargetBucketsComboBox.Text);
-            domainsResult = bucketManager.Domains(bucket);
+            startWith = txtStartWith.Text.Trim();
 
-            if (listResult.Result.Items.Count >= 1000)
+            ThreadPool.QueueUserWorkItem((state) =>
             {
-                btnSearch.Content = "加载更多";
-            }
-            else
-            {
-                num = 1;
-                marker = "";
-                btnSearch.Content = "查询";
-            }
 
-            if (qiNiuFileInfoList == null || num == 1)
-            {
-                qiNiuFileInfoList = new List<QiNiuFileInfo>();
-            }
+                reloadSearch();
+            });
+
+            LoadProgressBar();
+
+            Thread.Sleep(10);
 
 
-
-            foreach (ListItem item in listResult.Result.Items)
-            {
-                // item.EndUser
-                QiNiuFileInfo f = new QiNiuFileInfo
-                {
-                    Num = num,
-                    FileName = item.Key,
-                    FileType = item.MimeType,
-                    StorageType = QiNiuHelper.GetStorageType(item.FileType),
-                    FileSize = QiNiuHelper.GetFileSize(item.Fsize),
-                    EndUser = item.EndUser,
-                    CreateDate = QiNiuHelper.GetDataTime(item.PutTime)
-                };
-                qiNiuFileInfoList.Add(f);
-                num++;
-            }
-            marker = listResult.Result.Marker;
-
-
-            if (qiNiuFileInfoList.Count > 0)
-            {
-                dgResult.ItemsSource = !string.IsNullOrWhiteSpace(txtEndWith.Text)
-                    ? qiNiuFileInfoList.Where(f => f.FileName.EndsWith(txtEndWith.Text.Trim()))
-                    : qiNiuFileInfoList;
-            }
-            else
-            {
-                dgResult.ItemsSource = new List<QiNiuFileInfo>();
-            }
+          
         }
 
+        private void reloadSearch()
+        {
+            ListResult listResult = bucketManager.ListFiles(bucket, startWith, marker, 1000, "");
+            progressbarNeedStop = true;
+            Dispatcher.Invoke(new Action(() =>
+            {
+                pb1.Visibility = Visibility.Hidden;
+                if (listResult?.Result?.Items != null && listResult.Result.Items.Count >= 1000)
+                {
+                    btnSearch.Content = "加载更多";
+                }
+                else
+                {
+                    num = 1;
+                    marker = "";
+                    btnSearch.Content = "查询";
+                }
+
+                if (qiNiuFileInfoList == null || num == 1)
+                {
+                    qiNiuFileInfoList = new List<QiNiuFileInfo>();
+                }
+
+
+                if (listResult?.Result?.Items != null)
+                {
+
+                    foreach (ListItem item in listResult.Result.Items)
+                    {
+                        // item.EndUser
+                        QiNiuFileInfo f = new QiNiuFileInfo
+                        {
+                            Num = num,
+                            FileName = item.Key,
+                            FileType = item.MimeType,
+                            StorageType = QiNiuHelper.GetStorageType(item.FileType),
+                            FileSize = QiNiuHelper.GetFileSize(item.Fsize),
+                            EndUser = item.EndUser,
+                            CreateDate = QiNiuHelper.GetDataTime(item.PutTime)
+                        };
+                        qiNiuFileInfoList.Add(f);
+                        num++;
+                    }
+                    marker = listResult.Result.Marker;
+                }
+
+
+                if (qiNiuFileInfoList.Count > 0)
+                {
+                    dgResult.ItemsSource = !string.IsNullOrWhiteSpace(txtEndWith.Text)
+                        ? qiNiuFileInfoList.Where(f => f.FileName.EndsWith(txtEndWith.Text.Trim()))
+                        : qiNiuFileInfoList;
+                }
+                else
+                {
+                    dgResult.ItemsSource = new List<QiNiuFileInfo>();
+                }
+            }));
+
+           
+        }
 
 
 
@@ -352,7 +382,11 @@ namespace QiNiuClient
             btnBatchDel.IsEnabled = true;
             btnBatchDownload.IsEnabled = true;
             if (SyncTargetBucketsComboBox.SelectedValue != null)
-                bucket = SyncTargetBucketsComboBox.SelectedValue.ToString();
+            {
+                 bucket = SyncTargetBucketsComboBox.SelectedValue.ToString();
+                domainsResult = bucketManager.Domains(bucket);
+            }
+               
             qiNiuFileInfoList = new List<QiNiuFileInfo>();
 
         }
@@ -473,11 +507,12 @@ namespace QiNiuClient
                 {
                     MessageBox.Show(rresult.ToString());
                 }
-
+                progressbarNeedStop = true;
 
             }
         }
 
+        //批量删除
         private void btnBatchDel_Click(object sender, RoutedEventArgs e)
         {
             Delete();
@@ -504,8 +539,17 @@ namespace QiNiuClient
             }
             if (list.Count > 0)
             {
-                //执行批量删除
-                List<string> ops = new List<string>();
+                string msg = string.Join(",", list.Select(q => q.FileName));
+                MessageBoxResult confirmToDel = MessageBox.Show("确认要删除所选行吗？\r\n"+msg, "提示", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                if (confirmToDel != MessageBoxResult.Yes)
+                {
+                    return;
+                }
+
+
+                    //执行批量删除
+                    List<string> ops = new List<string>();
                 foreach (var key in list)
                 {
                     string op = bucketManager.DeleteOp(bucket, key.FileName);
