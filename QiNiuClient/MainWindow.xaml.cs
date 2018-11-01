@@ -477,7 +477,10 @@ namespace QiNiuClient
                     // string pubfile = DownloadManager.CreatePublishUrl(domain, info.FileName);
 
                     string pubfile = GetPublishUrl(info.FileName);
-
+                    if (string.IsNullOrWhiteSpace(pubfile))
+                    {
+                        return;
+                    }
 
                     string saveFile = Path.Combine(fileSaveDir, info.FileName.Replace('/', '-'));
                     if (File.Exists(saveFile))
@@ -510,7 +513,7 @@ namespace QiNiuClient
                 progressbarNeedStop = true;
 
             }
-            throw new Exception("无法获得空间的域名");
+            MessageBox.Show("无法获得空间的域名");
         }
 
         //批量删除
@@ -726,6 +729,10 @@ namespace QiNiuClient
                     QiNiuFileInfo qiNiuFileInfo = list[i];
 
                     urls[i] = GetPublishUrl(qiNiuFileInfo.FileName);
+                    if (string.IsNullOrWhiteSpace(urls[i]))
+                    {
+                        return;
+                    }
                 }
 
                 MessageBox.Show(QiNiuHelper.RefreshUrls(mac, urls) ? "文件刷新成功" : "文件刷新失败");
@@ -794,7 +801,8 @@ namespace QiNiuClient
                 return DownloadManager.CreatePublishUrl(domainUrl, fileName);
             }
 
-            throw new Exception("无法获得空间域名");
+            MessageBox.Show("无法获得空间的域名");
+            return string.Empty;
         }
 
 
@@ -815,7 +823,8 @@ namespace QiNiuClient
 
             }
 
-            throw new Exception("无法获得空间域名");
+            MessageBox.Show("无法获得空间的域名");
+            return string.Empty;
         }
 
 
@@ -1215,7 +1224,10 @@ namespace QiNiuClient
                 if (list[0].FileType.StartsWith("image"))
                 {
                     address = GetPrivateUrl(list[0].FileName + "?imageView2/2/w/300/h/200/interlace/1/q/100");
-
+                    if (string.IsNullOrWhiteSpace(address))
+                    {
+                        return;
+                    }
                 }
                 PreviewWindow pw = new PreviewWindow
                 {
