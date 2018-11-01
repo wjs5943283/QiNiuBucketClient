@@ -513,7 +513,11 @@ namespace QiNiuClient
                 progressbarNeedStop = true;
 
             }
-            MessageBox.Show("无法获得空间的域名");
+            else
+            {
+                MessageBox.Show("无法获得空间的域名");
+            }
+           
         }
 
         //批量删除
@@ -800,9 +804,13 @@ namespace QiNiuClient
 
                 return DownloadManager.CreatePublishUrl(domainUrl, fileName);
             }
+            else
+            {
+                 MessageBox.Show("无法获得空间的域名");
+               return string.Empty  ;
+            }
 
-            MessageBox.Show("无法获得空间的域名");
-            return string.Empty;
+         
         }
 
 
@@ -822,9 +830,13 @@ namespace QiNiuClient
                 return DownloadManager.CreatePrivateUrl(mac, domain, fileName, 3600);
 
             }
-
-            MessageBox.Show("无法获得空间的域名");
+            else
+            {
+                  MessageBox.Show("无法获得空间的域名");
             return string.Empty;
+            }
+
+          
         }
 
 
