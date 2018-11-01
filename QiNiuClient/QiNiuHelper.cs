@@ -127,5 +127,39 @@ namespace QiNiuClient
             System.Drawing.Image img = System.Drawing.Image.FromFile(path);
             return img.RawFormat.Equals(System.Drawing.Imaging.ImageFormat.Jpeg);
         }
+
+        /// <summary>
+        /// 移动文件，如果bucket和newBucket相同则为重命名文件
+        /// </summary>
+        /// <param name="bucketManager"></param>
+        /// <param name="bucket">原始空间</param>
+        /// <param name="Key">原始文件名</param>
+        /// <param name="newBucket">目标空间</param>
+        /// <param name="newKey">目标文件名</param>
+        /// <param name="force">是否设置强制覆盖</param>
+        /// <returns></returns>
+        public static ActionResult Move(BucketManager bucketManager,string bucket, string Key, string newBucket, string newKey, bool force = false)
+        {
+            HttpResult moveRet = bucketManager.Move(bucket, Key, newBucket, newKey, force);
+            ActionResult ar = new ActionResult();
+            if (moveRet.Code == (int) HttpCode.OK)
+            {
+                ar.IsSuccess = true;
+                ar.Msg = moveRet.ToString();
+            }
+            else
+            {
+                ar.IsSuccess = false;
+                ar.Msg = moveRet.ToString();
+            }
+            return ar;
+        }
+
+    }
+
+    public class ActionResult
+    {
+        public bool IsSuccess { get; set; }
+        public string Msg { get; set; }
     }
 }

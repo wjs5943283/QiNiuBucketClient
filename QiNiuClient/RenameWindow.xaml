@@ -1,0 +1,14 @@
+﻿<Window x:Class="QiNiuClient.RenameWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:QiNiuClient"
+        mc:Ignorable="d"
+        Title="重命名" Height="83.114" Width="555.409" FontSize="16" WindowStartupLocation="CenterOwner" Loaded="Window_Loaded">
+    <Grid>
+        <Button Content="确定" x:Name="btnRename" HorizontalAlignment="Left" Margin="446,13,0,0" VerticalAlignment="Top" Width="89" RenderTransformOrigin="0.509,-0.631" Height="32" FontSize="16" Click="btnRename_Click"/>
+        <TextBox x:Name="txtRename" HorizontalAlignment="Left" Height="31" Margin="17,0,0,11" TextWrapping="Wrap" Text="textbox" VerticalAlignment="Bottom" Width="409" FontSize="16"/>
+
+    </Grid>
+</Window>

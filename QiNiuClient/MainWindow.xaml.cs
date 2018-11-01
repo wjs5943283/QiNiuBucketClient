@@ -510,6 +510,7 @@ namespace QiNiuClient
                 progressbarNeedStop = true;
 
             }
+            throw new Exception("无法获得空间的域名");
         }
 
         //批量删除
@@ -539,7 +540,7 @@ namespace QiNiuClient
             }
             if (list.Count > 0)
             {
-                string msg = string.Join(",", list.Select(q => q.FileName));
+                string msg = string.Join(",\r\n", list.Select(q => q.FileName));
                 MessageBoxResult confirmToDel = MessageBox.Show("确认要删除所选行吗？\r\n"+msg, "提示", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
                 if (confirmToDel != MessageBoxResult.Yes)
@@ -1244,6 +1245,53 @@ namespace QiNiuClient
             System.Diagnostics.Process.Start("https://github.com/wjs5943283/QiNiuBucketClient");
 
         }
+
+        /// <summary>
+        /// 重命名
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MiReName_Click(object sender, RoutedEventArgs e)
+        {
+            ReName();
+
+        }
+
+        private void ReName()
+        {
+            if (dgResult.ItemsSource == null && dgResult.SelectedItems.Count <= 0)
+            {
+                return;
+
+            }
+
+            List<QiNiuFileInfo> list = new List<QiNiuFileInfo>();
+            foreach (var item in dgResult.SelectedItems)
+            {
+                QiNiuFileInfo info = (QiNiuFileInfo)item;
+                if (info != null)
+                {
+                    list.Add(info);
+                }
+            }
+            if (list.Count > 0)
+            {
+                
+                RenameWindow rw = new RenameWindow()
+                {
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Owner = this,
+                    FileName = list[0].FileName,
+                    BucketManager = bucketManager,
+                    Bucket = bucket
+                };
+
+                rw.ShowDialog();
+                Search();
+            }
+        }
+
+       
     }
 }
 

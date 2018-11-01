@@ -11,6 +11,7 @@
             <MenuItem  Header="刷新" Click="MiRefresh_Click" />
             <MenuItem  Header="预览" Click="MiPreview_Click" />
             <MenuItem  Header="下载" Click="MiDownload_Click" />
+          <MenuItem  Header="重命名" Click="MiReName_Click" />
             <MenuItem  Header="删除" Click="MiDelete_Click" />
             <MenuItem  Header="全选" Click="MISelectAll_Click" />
             <MenuItem  Header="复制文件名" Click="MICopyFileName_Click" />
