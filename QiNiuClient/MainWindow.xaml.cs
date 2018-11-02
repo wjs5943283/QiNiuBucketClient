@@ -502,14 +502,7 @@ namespace QiNiuClient
                     }
 
                 }
-                if (string.IsNullOrWhiteSpace(rresult.ToString()))
-                {
-                    MessageBox.Show("下载结束！");
-                }
-                else
-                {
-                    MessageBox.Show(rresult.ToString());
-                }
+                MessageBox.Show(string.IsNullOrWhiteSpace(rresult.ToString()) ? "下载结束！" : rresult.ToString());
                 progressbarNeedStop = true;
 
             }
