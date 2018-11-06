@@ -384,7 +384,17 @@ namespace QiNiuClient
             if (SyncTargetBucketsComboBox.SelectedValue != null)
             {
                  bucket = SyncTargetBucketsComboBox.SelectedValue.ToString();
+                DomainsComboBox.Items.Clear();
                 domainsResult = bucketManager.Domains(bucket);
+                if (domainsResult.Result.Count > 0)
+                {
+                 
+                    foreach (string domain in domainsResult.Result)
+                    {
+                        DomainsComboBox.Items.Add(domain);
+                    }
+                    DomainsComboBox.SelectedValue = DomainsComboBox.Items[0];
+                }
             }
                
             qiNiuFileInfoList = new List<QiNiuFileInfo>();

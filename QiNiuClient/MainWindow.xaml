@@ -11,7 +11,7 @@
             <MenuItem  Header="刷新" Click="MiRefresh_Click" />
             <MenuItem  Header="预览" Click="MiPreview_Click" />
             <MenuItem  Header="下载" Click="MiDownload_Click" />
-          <MenuItem  Header="重命名" Click="MiReName_Click" />
+            <MenuItem  Header="重命名" Click="MiReName_Click" />
             <MenuItem  Header="删除" Click="MiDelete_Click" />
             <MenuItem  Header="全选" Click="MISelectAll_Click" />
             <MenuItem  Header="复制文件名" Click="MICopyFileName_Click" />
@@ -48,18 +48,18 @@
                     <ProgressBar x:Name="pb1" HorizontalAlignment="Left" Height="19" Margin="226,98,0,0" VerticalAlignment="Top" Width="143" Grid.Column="1"/>
                     <TextBox x:Name="txtDelAfDays" HorizontalAlignment="Left" Height="23" Margin="20,96,0,0" TextWrapping="Wrap" Text="365" VerticalAlignment="Top" Width="37" Grid.Column="1" IsEnabled="False"/>
                     <Button x:Name="BtnConnet" Content="连接" HorizontalAlignment="Left" Margin="159,19,0,0" VerticalAlignment="Top" Width="81" Click="BtnConnet_Click" Height="21" Grid.Column="1"/>
-                    <ComboBox x:Name="SyncTargetBucketsComboBox" HorizontalAlignment="Left" Margin="350,19,0,0" VerticalAlignment="Top" Width="143" Height="22" SelectionChanged="SyncTargetBucketsComboBox_SelectionChanged" RenderTransformOrigin="-0.21,0.591" Grid.Column="1"/>
-                    <Label Content="存储空间列表:" HorizontalAlignment="Left" Margin="257,19,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.487,4.042" Height="24" Width="88" Grid.Column="1"/>
+                    <ComboBox x:Name="SyncTargetBucketsComboBox" HorizontalAlignment="Left" Margin="372,19,0,0" VerticalAlignment="Top" Width="209" Height="22" SelectionChanged="SyncTargetBucketsComboBox_SelectionChanged" RenderTransformOrigin="-0.21,0.591" Grid.Column="1"/>
+                    <Label Content="存储空间列表:" HorizontalAlignment="Left" Margin="282,19,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.487,4.042" Height="24" Width="88" Grid.Column="1"/>
                     <Label Content="区      域:" HorizontalAlignment="Left" Margin="13,19,0,0" VerticalAlignment="Top" Height="24" Width="76" Grid.ColumnSpan="2"/>
                     <ComboBox x:Name="AreaComboBox" HorizontalAlignment="Left" Margin="79,19,0,0" VerticalAlignment="Top" Width="151" RenderTransformOrigin="1.479,0.455" Height="22" Grid.ColumnSpan="2"/>
                     <TextBox x:Name="txtStartWith" HorizontalAlignment="Left" Height="23" Margin="80,52,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="71" Grid.ColumnSpan="2"/>
-                    <Button x:Name="btnSearch" Content="查询" HorizontalAlignment="Left" Margin="209,54,0,0" VerticalAlignment="Top" Width="82" Height="21" RenderTransformOrigin="-4,0.429" Click="btnSearch_Click" IsEnabled="False" Grid.Column="1"/>
+                    <Button x:Name="btnSearch" Content="查询" HorizontalAlignment="Left" Margin="209,54,0,0" VerticalAlignment="Top" Width="60" Height="21" RenderTransformOrigin="-4,0.429" Click="btnSearch_Click" IsEnabled="False" Grid.Column="1"/>
                     <Label Content="StartWith:" HorizontalAlignment="Left" Margin="13,51,0,0" VerticalAlignment="Top" Height="24" Width="76" RenderTransformOrigin="0.5,2.667" Grid.ColumnSpan="2"/>
                     <TextBox x:Name="txtEndWith" HorizontalAlignment="Left" Height="23" Margin="126,52,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="73" Grid.Column="1"/>
                     <Label Content="EndWith:" HorizontalAlignment="Left" Margin="67,51,0,0" VerticalAlignment="Top" Height="24" Width="76" RenderTransformOrigin="0.5,2.667" Grid.Column="1"/>
-                    <Button x:Name="btnUpload" Content="上传"  IsEnabled="False" HorizontalAlignment="Left" Margin="313,53,0,0" VerticalAlignment="Top" Width="75" Height="21" RenderTransformOrigin="-2,2.381" Click="btnUpload_Click" Grid.Column="1"/>
-                    <Button x:Name="btnBatchDel" Content="删除"  IsEnabled="False" HorizontalAlignment="Left" Margin="506,53,0,0" VerticalAlignment="Top" Width="75" Height="21" Click="btnBatchDel_Click" Grid.Column="1"/>
-                    <Button x:Name="btnBatchDownload" Content="下载"  IsEnabled="False" HorizontalAlignment="Left" Margin="407,53,0,0" VerticalAlignment="Top" Width="75" Height="21" RenderTransformOrigin="-0.813,0.619" Click="btnBatchDownload_Click" Grid.Column="1"/>
+                    <Button x:Name="btnUpload" Content="上传"  IsEnabled="False" HorizontalAlignment="Left" Margin="383,96,0,0" VerticalAlignment="Top" Width="52" Height="21" RenderTransformOrigin="-2,2.381" Click="btnUpload_Click" Grid.Column="1"/>
+                    <Button x:Name="btnBatchDel" Content="删除"  IsEnabled="False" HorizontalAlignment="Left" Margin="526,96,0,0" VerticalAlignment="Top" Width="55" Height="21" Click="btnBatchDel_Click" Grid.Column="1"/>
+                    <Button x:Name="btnBatchDownload" Content="下载"  IsEnabled="False" HorizontalAlignment="Left" Margin="453,96,0,0" VerticalAlignment="Top" Width="51" Height="21" RenderTransformOrigin="-0.813,0.619" Click="btnBatchDownload_Click" Grid.Column="1"/>
                     <GroupBox Header="上传设置 " HorizontalAlignment="Left" Height="53" Margin="13,78,0,0" VerticalAlignment="Top" Width="665" Grid.ColumnSpan="2"/>
                     <DataGrid ContextMenu="{StaticResource ResourceKey=ContextMenu}" x:Name="dgResult" AutoGenerateColumns="False" CanUserAddRows="False" Margin="9,138,10,10" RenderTransformOrigin="0.488,1.726" Grid.ColumnSpan="2">
 
@@ -74,6 +74,8 @@
 
                         </DataGrid.Columns>
                     </DataGrid>
+                    <ComboBox x:Name="DomainsComboBox" HorizontalAlignment="Left" Margin="372,49,0,0" VerticalAlignment="Top" Width="209" Height="22" RenderTransformOrigin="-0.21,0.591" Grid.Column="1" IsEditable="True"/>
+                    <Label Content="域名列表:" HorizontalAlignment="Left" Margin="306,49,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.487,4.042" Height="24" Width="88" Grid.Column="1"/>
                 </Grid>
             </TabItem>
             <TabItem Header="融合CDN" Margin="25,0,-33,-4">
