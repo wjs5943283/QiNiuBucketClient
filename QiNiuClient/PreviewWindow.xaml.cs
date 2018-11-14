@@ -24,7 +24,10 @@ namespace QiNiuClient
             InitializeComponent();
         }
 
-        public string PreviewFilePath;
+       public string PreviewFilePath { get; set; }
+
+       // public ImageSource ImageSource { get; set; }
+
 
         private void Image_Loaded(object sender, RoutedEventArgs e)
         {
@@ -33,7 +36,8 @@ namespace QiNiuClient
             {
                 try
                 {
-                    ImageBox.Source = new BitmapImage(new Uri(PreviewFilePath));
+               
+                   ImageBox.Source = new BitmapImage(new Uri(PreviewFilePath));
                 }
                 catch (Exception)
                 {

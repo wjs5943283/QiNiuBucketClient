@@ -8,7 +8,7 @@
         Title="七牛存储管理客户端" Height="597" Width="708" Loaded="Window_Loaded" Icon="1.ico">
     <Window.Resources>
         <ContextMenu x:Key="ContextMenu">
-            <MenuItem  Header="刷新" Click="MiRefresh_Click" />
+            <MenuItem  Header="刷新" Name="MiRefresh" Click="MiRefresh_Click" />
             <MenuItem  Header="预览" Click="MiPreview_Click" />
             <MenuItem  Header="下载" Click="MiDownload_Click" />
             <MenuItem  Header="重命名" Click="MiReName_Click" />

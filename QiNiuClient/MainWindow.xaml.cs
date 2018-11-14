@@ -165,7 +165,7 @@ namespace QiNiuClient
             {
 
                 reloadBuckets();
-               
+
             });
 
             LoadProgressBar();
@@ -195,10 +195,10 @@ namespace QiNiuClient
                     if (progressbarNeedStop)
                     {
                         return;
-                        
+
                     }
                 }
-                
+
             });
 
         }
@@ -284,90 +284,118 @@ namespace QiNiuClient
         /// </summary>
         private void Search()
         {
+            if (btnSearch.IsEnabled == false)
+            {
+                return;
+            }
+
+            btnSearch.IsEnabled = false;
+
+
+
             if (string.IsNullOrWhiteSpace(marker))
             {
                 num = 1;
-                btnSearch.Content = "查询";
+                qiNiuFileInfoList = new List<QiNiuFileInfo>();
+
             }
-           
+
             bucket = SyncTargetBucketsComboBox.Text;
             startWith = txtStartWith.Text.Trim();
-
             ThreadPool.QueueUserWorkItem((state) =>
             {
+                ListResult listResult = bucketManager.ListFiles(bucket, startWith, marker, 5000, "");
+                Dispatcher.Invoke(new Action(() =>
+                {
+                    if (listResult != null && listResult.Result != null && listResult.Result.Marker != null)
+                    {
+                        marker = listResult.Result.Marker;
+                    }
+                    else
+                    {
 
-                reloadSearch();
+                        marker = string.Empty;
+                    }
+                    if (listResult?.Result?.Items != null)
+                    {
+
+                        foreach (ListItem item in listResult.Result.Items)
+                        {
+                            // item.EndUser
+                            QiNiuFileInfo f = new QiNiuFileInfo
+                            {
+
+                                FileName = item.Key,
+                                FileType = item.MimeType,
+                                StorageType = QiNiuHelper.GetStorageType(item.FileType),
+                                FileSize = QiNiuHelper.GetFileSize(item.Fsize),
+                                EndUser = item.EndUser,
+                                CreateDate = QiNiuHelper.GetDataTime(item.PutTime)
+                            };
+                            qiNiuFileInfoList.Add(f);
+
+                        }
+
+                        if (qiNiuFileInfoList.Count > 0)
+                        {
+                            //dgResult.ItemsSource = !string.IsNullOrWhiteSpace(txtEndWith.Text)
+                            //    ? qiNiuFileInfoList.Where(f => f.FileName.EndsWith(txtEndWith.Text.Trim()))
+                            //    : qiNiuFileInfoList;
+                            var list = qiNiuFileInfoList;
+
+
+                            if (!string.IsNullOrWhiteSpace(txtEndWith.Text))
+                            {
+                                list = qiNiuFileInfoList.Where(f => f.FileName.EndsWith(txtEndWith.Text.Trim())).ToList();
+
+                            }
+                            if (list.Count > 0)
+                            {
+                                // dgResult.ItemsSource = list.OrderBy(t => t.CreateDate).ToList();
+                                num = 1;
+                                list = list.OrderByDescending(t => t.CreateDate).ToList();
+                                foreach (var s in list)
+                                {
+                                    s.Num = num++;
+                                }
+                                dgResult.ItemsSource = list;
+                            }
+                            else
+                            {
+                                dgResult.ItemsSource = new List<QiNiuFileInfo>();
+                            }
+                            //  dgResult.ItemsSource = list;
+
+                        }
+                        else
+                        {
+                            dgResult.ItemsSource = new List<QiNiuFileInfo>();
+
+
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("未能加载数据！");
+
+                    }
+                    btnSearch.IsEnabled = true;
+                }));
             });
 
-            LoadProgressBar();
-
-            Thread.Sleep(10);
 
 
-          
+
+
+
+
+
+
+
+
         }
 
-        private void reloadSearch()
-        {
-            ListResult listResult = bucketManager.ListFiles(bucket, startWith, marker, 1000, "");
-            progressbarNeedStop = true;
-            Dispatcher.Invoke(new Action(() =>
-            {
-                pb1.Visibility = Visibility.Hidden;
-                if (listResult?.Result?.Items != null && listResult.Result.Items.Count >= 1000)
-                {
-                    btnSearch.Content = "加载更多";
-                }
-                else
-                {
-                    num = 1;
-                    marker = "";
-                    btnSearch.Content = "查询";
-                }
 
-                if (qiNiuFileInfoList == null || num == 1)
-                {
-                    qiNiuFileInfoList = new List<QiNiuFileInfo>();
-                }
-
-
-                if (listResult?.Result?.Items != null)
-                {
-
-                    foreach (ListItem item in listResult.Result.Items)
-                    {
-                        // item.EndUser
-                        QiNiuFileInfo f = new QiNiuFileInfo
-                        {
-                            Num = num,
-                            FileName = item.Key,
-                            FileType = item.MimeType,
-                            StorageType = QiNiuHelper.GetStorageType(item.FileType),
-                            FileSize = QiNiuHelper.GetFileSize(item.Fsize),
-                            EndUser = item.EndUser,
-                            CreateDate = QiNiuHelper.GetDataTime(item.PutTime)
-                        };
-                        qiNiuFileInfoList.Add(f);
-                        num++;
-                    }
-                    marker = listResult.Result.Marker;
-                }
-
-
-                if (qiNiuFileInfoList.Count > 0)
-                {
-                    dgResult.ItemsSource = !string.IsNullOrWhiteSpace(txtEndWith.Text)
-                        ? qiNiuFileInfoList.Where(f => f.FileName.EndsWith(txtEndWith.Text.Trim()))
-                        : qiNiuFileInfoList;
-                }
-                else
-                {
-                    dgResult.ItemsSource = new List<QiNiuFileInfo>();
-                }
-            }));
-
-           
-        }
 
 
 
@@ -383,20 +411,42 @@ namespace QiNiuClient
             btnBatchDownload.IsEnabled = true;
             if (SyncTargetBucketsComboBox.SelectedValue != null)
             {
-                 bucket = SyncTargetBucketsComboBox.SelectedValue.ToString();
+                bucket = SyncTargetBucketsComboBox.SelectedValue.ToString();
                 DomainsComboBox.Items.Clear();
-                domainsResult = bucketManager.Domains(bucket);
-                if (domainsResult.Result.Count > 0)
+
+                //多线程处理
+                ThreadPool.QueueUserWorkItem((state) =>
                 {
-                 
-                    foreach (string domain in domainsResult.Result)
+                    domainsResult = bucketManager.Domains(bucket);
+                    Dispatcher.Invoke(new Action(() =>
                     {
-                        DomainsComboBox.Items.Add(domain);
-                    }
-                    DomainsComboBox.SelectedValue = DomainsComboBox.Items[0];
-                }
+                        if (domainsResult.Result.Count > 0)
+                        {
+
+                            foreach (string domain in domainsResult.Result)
+                            {
+                                DomainsComboBox.Items.Add(domain);
+                            }
+                            DomainsComboBox.SelectedValue = DomainsComboBox.Items[0];
+                        }
+
+                    }));
+                });
+
+
+
+                //domainsResult = bucketManager.Domains(bucket);
+                //if (domainsResult.Result.Count > 0)
+                //{
+
+                //    foreach (string domain in domainsResult.Result)
+                //    {
+                //        DomainsComboBox.Items.Add(domain);
+                //    }
+                //    DomainsComboBox.SelectedValue = DomainsComboBox.Items[0];
+                //}
             }
-               
+
             qiNiuFileInfoList = new List<QiNiuFileInfo>();
 
         }
@@ -520,7 +570,7 @@ namespace QiNiuClient
             {
                 MessageBox.Show("无法获得空间的域名");
             }
-           
+
         }
 
         //批量删除
@@ -551,7 +601,7 @@ namespace QiNiuClient
             if (list.Count > 0)
             {
                 string msg = string.Join(",\r\n", list.Select(q => q.FileName));
-                MessageBoxResult confirmToDel = MessageBox.Show("确认要删除所选行吗？\r\n"+msg, "提示", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                MessageBoxResult confirmToDel = MessageBox.Show("确认要删除所选行吗？\r\n" + msg, "提示", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
                 if (confirmToDel != MessageBoxResult.Yes)
                 {
@@ -559,8 +609,8 @@ namespace QiNiuClient
                 }
 
 
-                    //执行批量删除
-                    List<string> ops = new List<string>();
+                //执行批量删除
+                List<string> ops = new List<string>();
                 foreach (var key in list)
                 {
                     string op = bucketManager.DeleteOp(bucket, key.FileName);
@@ -696,16 +746,31 @@ namespace QiNiuClient
             {
                 string[] urls = new string[list.Count];
                 qiNiuClientCfg.DeleteAfterDays = Convert.ToInt32(txtDelAfDays.Text.Trim());
-                StringBuilder sb = new StringBuilder();
-                foreach (QiNiuFileInfo qiNiuFileInfo in list)
+                LoadProgressBar();
+                System.Threading.ThreadPool.QueueUserWorkItem((state) =>
                 {
-                    HttpResult expireRet = bucketManager.DeleteAfterDays(bucket, qiNiuFileInfo.FileName, qiNiuClientCfg.DeleteAfterDays.Value);
-                    sb.AppendLine(expireRet.Code != (int)HttpCode.OK
-                        ? $"{qiNiuFileInfo.FileName}:修改删除时间失败！"
-                        : $"{qiNiuFileInfo.FileName}:修改删除时间成功！");
-                }
 
-                MessageBox.Show(sb.ToString());
+                  
+                    StringBuilder sb = new StringBuilder();
+                    foreach (QiNiuFileInfo qiNiuFileInfo in list)
+                    {
+                        HttpResult expireRet = bucketManager.DeleteAfterDays(bucket, qiNiuFileInfo.FileName, qiNiuClientCfg.DeleteAfterDays.Value);
+                        sb.AppendLine(expireRet.Code != (int)HttpCode.OK
+                            ? $"{qiNiuFileInfo.FileName}:修改删除时间失败！"
+                            : $"{qiNiuFileInfo.FileName}:修改删除时间成功！");
+                    }
+
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+                        pb1.Visibility = Visibility.Hidden;
+                        MessageBox.Show(sb.ToString());
+                    }));
+                });
+
+
+
+
+              
 
 
             }
@@ -741,8 +806,15 @@ namespace QiNiuClient
                         return;
                     }
                 }
+                ThreadPool.QueueUserWorkItem((state) =>
+                {
+                    bool result = QiNiuHelper.RefreshUrls(mac, urls);
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+                        MessageBox.Show(result ? "文件刷新成功" : "文件刷新失败");
+                    }));
+                });
 
-                MessageBox.Show(QiNiuHelper.RefreshUrls(mac, urls) ? "文件刷新成功" : "文件刷新失败");
 
 
             }
@@ -809,18 +881,18 @@ namespace QiNiuClient
             }
             else
             {
-                 MessageBox.Show("无法获得空间的域名");
-               return string.Empty  ;
+                MessageBox.Show("无法获得空间的域名");
+                return string.Empty;
             }
 
-         
+
         }
 
 
 
         private string GetPrivateUrl(string fileName)
         {
-            if (domainsResult.Result.Count > 0)
+            if (domainsResult?.Result?.Count > 0)
             {
 
                 string domain = domainsResult.Result[0];
@@ -835,11 +907,11 @@ namespace QiNiuClient
             }
             else
             {
-                  MessageBox.Show("无法获得空间的域名");
-            return string.Empty;
+                MessageBox.Show("无法获得空间的域名");
+                return string.Empty;
             }
 
-          
+
         }
 
 
@@ -1236,22 +1308,76 @@ namespace QiNiuClient
             if (list.Count > 0)
             {
                 string address = string.Empty;
-                if (list[0].FileType.StartsWith("image"))
+
+                if (list[0].FileType.StartsWith("text") || list[0].FileType.StartsWith("application"))
                 {
-                    address = GetPrivateUrl(list[0].FileName + "?imageView2/2/w/300/h/200/interlace/1/q/100");
+                    address = GetPrivateUrl(list[0].FileName);
                     if (string.IsNullOrWhiteSpace(address))
                     {
                         return;
                     }
+                    string tempfile = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), list[0].FileName);
+
+                    System.Threading.ThreadPool.QueueUserWorkItem((state) =>
+                    {
+                        System.Net.WebClient wc = new System.Net.WebClient();
+
+                        wc.DownloadFile(address, tempfile);
+
+                        Dispatcher.Invoke(new Action(() =>
+                        {
+                            System.Diagnostics.Process.Start(tempfile);
+                        }));
+                    });
+
+                    return;
                 }
-                PreviewWindow pw = new PreviewWindow
+                //if (list[0].FileType.StartsWith("text"))
+                // {
+                //     address = GetPrivateUrl(list[0].FileName);
+                //     if (string.IsNullOrWhiteSpace(address))
+                //     {
+                //         return;
+                //     }
+
+                //     System.Threading.ThreadPool.QueueUserWorkItem((state) =>
+                //     {
+                //         System.Net.WebClient wc = new System.Net.WebClient();
+                //         string s = wc.DownloadString(address);
+
+                //         Dispatcher.Invoke(new Action(() =>
+                //         {
+                //             new TextWindow
+                //             {
+                //                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                //                 Owner = this,
+                //                 TxtContent = s
+                //             }.ShowDialog();
+                //         }));
+                //     });
+
+                //     return;
+                // }
+                if (list[0].FileType.StartsWith("image"))
+                {
+                    address = GetPrivateUrl(list[0].FileName + "?imageView2/2/w/600/h/400/interlace/1/q/100");
+                    if (string.IsNullOrWhiteSpace(address))
+                    {
+                        return;
+                    }
+
+                }
+
+                new PreviewWindow
                 {
                     WindowStartupLocation = WindowStartupLocation.CenterOwner,
                     Owner = this,
                     PreviewFilePath = address
-                };
+                }.ShowDialog();
 
-                pw.ShowDialog();
+
+
+
             }
         }
 
@@ -1303,7 +1429,7 @@ namespace QiNiuClient
             }
             if (list.Count > 0)
             {
-                
+
                 RenameWindow rw = new RenameWindow()
                 {
                     WindowStartupLocation = WindowStartupLocation.CenterOwner,
@@ -1318,7 +1444,7 @@ namespace QiNiuClient
             }
         }
 
-       
+
     }
 }
 

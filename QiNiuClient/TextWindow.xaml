@@ -1,13 +1,13 @@
-﻿<Window x:Class="QiNiuClient.PreviewWindow"
+﻿<Window x:Class="QiNiuClient.TextWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:QiNiuClient"
         mc:Ignorable="d"
-        Title="预览" Height="249.152" Width="330.848">
+        Title="文本文件" Height="450" Width="800" Loaded="Window_Loaded">
     <Grid>
-        <Image Name="ImageBox" Loaded="Image_Loaded" Stretch="Fill"/>
+        <TextBox Name="txtBox" TextWrapping="Wrap" Text="" HorizontalScrollBarVisibility="Visible"/>
 
     </Grid>
 </Window>
