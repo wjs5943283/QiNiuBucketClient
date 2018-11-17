@@ -126,6 +126,13 @@ namespace QiNiuClient
 
         private void ConnectServer()
         {
+
+            if (string.IsNullOrWhiteSpace(TxtAK.Text) || string.IsNullOrWhiteSpace(TxtSk.Text))
+            {
+                MessageBox.Show("Access Key 和Secret Key 不能为空！");
+                return;
+            }
+
             if (SyncTargetBucketsComboBox.Items.Count > 0)
             {
                 SyncTargetBucketsComboBox.ItemsSource = null;
@@ -133,11 +140,7 @@ namespace QiNiuClient
             }
 
 
-            if (string.IsNullOrWhiteSpace(TxtAK.Text) || string.IsNullOrWhiteSpace(TxtSk.Text))
-            {
-                MessageBox.Show("Access Key 和Secret Key 不能为空！");
-                return;
-            }
+           
             //根据AK和SK连接七牛云存储，1.获得存储空间列表；2.若成功本机保存Ak和SK
             Qiniu.Storage.Config.DefaultRsHost = "rs.qiniu.com";
             if (!TxtAK.Text.Contains("*") && !TxtSk.Text.Contains("*"))
@@ -1316,7 +1319,11 @@ namespace QiNiuClient
                     {
                         return;
                     }
-                    string tempfile = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), list[0].FileName);
+                  
+
+
+                    string tempfile = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), QiNiuHelper.RemoveWindowsFileNameSpicalChar(list[0].FileName));
+                   
 
                     System.Threading.ThreadPool.QueueUserWorkItem((state) =>
                     {

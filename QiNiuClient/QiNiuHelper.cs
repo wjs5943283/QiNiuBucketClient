@@ -155,6 +155,14 @@ namespace QiNiuClient
             return ar;
         }
 
+        public static string RemoveWindowsFileNameSpicalChar(string str,char repChar='-')
+        {
+
+            return str.Replace('\\',repChar).Replace('/', repChar).Replace(':', repChar).Replace('*', repChar).Replace('?', repChar).Replace('"', repChar).Replace('<', repChar).Replace('>', repChar).Replace('|', repChar);
+        }
+
+
+
     }
 
     public class ActionResult
